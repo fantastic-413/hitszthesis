@@ -1,50 +1,390 @@
 % !TEX root = ../main.tex
 
 % 中英标题：\chapter{中文标题}[英文标题]
-\chapter{排版公式}[Typesetting equations]
+\chapter{基于三元组骨架引导的检索增强生成方法}[Retrieval-Augmented Generation Method Guided by Triplet Skeleton]
 
 \section{引言}[Introduction]
 
-test
+大语言模型（Large Language Models, LLMs）凭借其强大的语义理解能力和海量预训练知识，在多种任务中取得了突破性进展。
+然而，在需要实时知识与精确推理的知识密集型任务中，LLMs仍然存在固有局限性。其中最主要的问题在于其知识具有静态性，
+受限于训练数据的时间截断，容易导致知识过时。
 
-\section{对物理量符号进行注释的情况}[The condition when physical symbols
-need to be annotated]
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.5\textwidth]{TTRAG_intro.png}
+  \caption{LLM在复杂推理任务中的典型工作流程}
+  \label{fig：TTRAG_intro}
+\end{figure}
 
-为使得对公式中物理量符号注释的转行与破折号“———”后第一个字对齐，此处最好采用表格
-环境。此表格无任何线条，左对齐，且在破折号处对齐，一共有“式中”二字、物理量符号和
-注释三列，表格的总宽度可选为文本宽度，因此应该采用\verb|tabularx|环境。由
-\verb|tabularx|环境生成的对公式中物理量符号进行注释的公式如式(\ref{eq:1})所示。
-\begin{equation}\label{eq:1}
-\ddot{\bm{\rho}}-\frac{\mu}{R_{t}^{3}}\left(3\bm{R_{t}}\frac{\bm{R_{t}\rho}}{R_{t}^{2}}-\bm{\rho}\right)=\bm{a}
+为了解决这一问题，检索增强生成（Retrieval-Augmented Generation, RAG）被提出作为一种有效方案。RAG通过从外部知识库中
+动态检索相关内容并作为上下文输入，从而缓解知识陈旧问题，并显著提升模型在事实性问答任务中的准确性。
+然而，标准RAG方法主要依赖语义相似度进行检索，往往会引入大量无关信息，从而降低上下文的信噪比，影响推理效果。
+
+为了解决文本上下文中信噪比较低的问题，研究者开始尝试将知识图谱（Knowledge Graph, KG）引入RAG框架。
+知识图谱通常通过开放信息抽取（Open Information Extraction, OpenIE）从非结构化文本中自动抽取关系，
+并以三元组形式组织知识。这种结构化表示能够提供清晰的推理框架，使模型能够更快地捕捉核心信息并沿着明确的推理路径进行推断。
+然而，现有的基于知识图谱增强的RAG方法（KG-RAG）仍然面临以下关键挑战：
+
+\begin{itemize}
+\item \textbf{多跳推理路径的脆弱性}： 在自动构建且存在噪声的知识图谱上进行多跳推理具有较大难度。
+错误关系或缺失连接可能导致推理链条中断，从而影响推理的完整性。
+
+\item \textbf{三元组语义稀疏性}： 尽管知识图谱三元组提供了清晰的结构框架，但其语义信息通常较为简洁，
+缺乏丰富的上下文细节与解释能力。这种语义稀疏性限制了模型生成复杂和全面答案的能力。
+
+\item \textbf{图结构利用不足}： 大多数KG-RAG方法仅将知识图谱作为检索索引，获取离散的三元组集合，
+并将其简单拼接后输入模型，忽略了图中丰富的拓扑结构信息，而这些结构信息对于复杂推理至关重要。
+\end{itemize}
+
+如\figref{fig：TTRAG_intro}所示，针对上述问题，本文提出一种基于三元组骨架引导的文本检索增强生成方法
+——\textbf{T}riple-Guided \textbf{T}ext \textbf{R}etrieval-\textbf{A}ugmented \textbf{G}eneration（\textbf{TTRAG}）。
+与传统RAG方法直接检索非结构化文本，或KG-RAG方法使用离散三元组不同，TTRAG提出了一种“两阶段融合”框架。
+该方法首先基于查询构建高质量的三元组推理骨架，然后在此结构化骨架基础上引入精确的文本上下文进行补充。
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.98 \textwidth]{TTRAG_overview.pdf}
+  \caption{TTRAG整体框架}
+  \label{fig：TTRAG_overview}
+\end{figure}
+
+\figref{fig：TTRAG_overview}展示了模型TTRAG的整体框架，
+TTRAG 专为复杂的推理任务而设计。它首先构建知识三元组的推理骨架，以确保逻辑严密的推理路径。
+然后，它使用相关的文本内容对该路径进行索引，从而提供丰富的语义信息，实现高效准确的推理。
+与其他 RAG 方法相比，TTRAG 具有部分可解释性，并提供清晰、渐进的推理路径。
+
+这种“先构建骨架、再进行语义增强”的策略，不仅为模型提供了清晰且可验证的推理路径，同时弥补了结构化知识语义表达不足的问题，
+实现了结构化知识与非结构化文本的有效融合。TTRAG方法的主要优势如下：
+
+\begin{itemize}
+\item \textbf{高精度上下文融合}： 通过先构建低噪声的三元组推理骨架，再引入与骨架高度相关的文本信息，
+实现结构化知识与非结构化知识的高效融合，从而显著降低无关信息干扰。
+
+\item \textbf{可解释且可靠的推理过程}： 基于显式的三元组推理链，模型能够生成透明且可验证的推理路径，
+有效提升生成结果的可信度并减少幻觉现象。
+
+\item \textbf{优越的实验性能}： 在多个多跳问答数据集上的实验结果表明，TTRAG在准确率和F1指标上均优于现有方法，
+且具有良好的泛化能力。
+
+\item \textbf{上下文信息密度提升}: 在三个多跳问答数据集上的实验表明，相较于基线方法，TTRAG可减少约70\%--80\%的提示词长度，
+显著降低了上下文中的噪声干扰并提升其知识密度。
+\end{itemize}
+
+% 待修改
+本章组织结构如下：3.2节介绍候选生成-候选排序两阶段实体标准化方法。3.3节介绍基于多层次实体表示的相似度计算方法。
+3.4节介绍模型训练方法。3.5节介绍实验结果与分析。3.6节为本章小结。
+
+\section{文档检索与知识图谱构建}[Document Retrieval and Knowledge Graph Construction]
+
+如\figref{fig：TTRAG_framework}所示，TTRAG首先从文档集合中检索出与查询最相关的前 $k$ 个文档，
+之后通过上下文学习提示大语言模型作为知识图谱生成器 $g$，对每个文档进行OpenIE，从这些文档中抽取实体关系三元组，
+从而构建文档级知识图谱。最后聚合这 $k$ 个文档，形成与查询相关的完整知识图谱 $\mathcal{G}_D$。
+
+\subsection{预备知识}[Preliminary]
+
+\paragraph{知识图谱表示}
+
+知识图谱（Knowledge Graph, KG）可形式化表示为一个有向图 $\mathcal{G} = (\mathcal{E}, \mathcal{R}, \mathcal{T})$。
+其中，$\mathcal{E}$ 表示实体集合（节点），$\mathcal{R}$ 表示关系集合（边类型），
+$\mathcal{T} \subseteq \mathcal{E} \times \mathcal{R} \times \mathcal{E}$ 表示事实三元组集合。
+每一个三元组 $(h, r, t)$ 表示从头实体 $h \in \mathcal{E}$ 到尾实体 $t \in \mathcal{E}$ 的一条有向关系边，
+其中 $r \in \mathcal{R}$ 表示实体之间的关系。上述三元组构成了知识图谱中结构化知识的基本单元。
+
+\begin{definition}[证据链]
+\label{def:evidence_chain}
+在知识图谱 $\mathcal{G}$ 中，\textbf{证据链（Evidence Chain）}是由多个相互连接的三元组组成的有序序列，
+用于表示一条完整的推理路径。长度为 $l$ 的证据链 $C$，从起始实体 $e_0$ 到终止实体 $e_l$，可表示为：
+\begin{equation}
+C(e_0, e_l) = \langle (e_0, r_1, e_1), (e_1, r_2, e_2), \dots, (e_{l-1}, r_l, e_l) \rangle
 \end{equation}
-\begin{tabularx}{\textwidth}{@{}l@{\quad}r@{———}X@{}}
-式中& $\bm{\rho}$ &追踪飞行器与目标飞行器之间的相对位置矢量；\\
-&  $\bm{\ddot{\rho}}$&追踪飞行器与目标飞行器之间的相对加速度；\\
-&  $\bm{a}$   &推力所产生的加速度；\\
-&  $\bm{R_t}$ & 目标飞行器在惯性坐标系中的位置矢量；\\
-&  $\omega_{t}$ & 目标飞行器的轨道角速度；\\
-\end{tabularx}\vspace{3.15bp}
-由此方法生成的注释内容应紧邻待注释公式并置于其下方，因此不能将代码放入
-\verb|table|浮动环境中。但此方法不能实现自动转页接排，可能会在当前页剩余空间不够
-时，全部移动到下一页而导致当前页出现很大空白。因此在需要转页处理时，还请您手动将
-需要转页的代码放入一个新的\verb|tabularx|环境中，将原来的一个\verb|tabularx|环境
-拆分为两个\verb|tabularx|环境。
 
-\section{子公式}[Sub-Equations]
+其中，$e_i \in \mathcal{E}$（$i = 0, 1, \dots, l$），$r_j \in \mathcal{R}$（$j = 1, 2, \dots, l$）。
+在该序列中，相邻两个三元组 $(e_{i-1}, r_i, e_i)$ 与 $(e_i, r_{i+1}, e_{i+1})$ 通过共享实体 $e_i$ 相连接，
+从而形成连续的推理路径。该结构能够自然地刻画从 $e_0$ 到 $e_l$ 的多跳推理过程，其中每一个三元组均作为支撑整体推理的证据。
+\end{definition}
 
-子公式编号示例：如果需要对公式的子公式进行编号，则使用\lstinline{subeqnarray}环境：
-\begin{subeqnarray}
-  \label{eqw}
-  \slabel{eq0}
-  x & = & a \times b \\
-  \slabel{eq1}
-  & = & z + t\\
-  \slabel{eq2}
-  & = & z + t
-\end{subeqnarray}
+\paragraph{任务定义}
 
-\equref{eqw}中，\lstinline{label}为整个公式的标签，\lstinline{slabel}为子公式的标签。
+给定自然语言问题 $q$ 以及知识图谱 $\mathcal{G}$，三元组骨架构建的核心任务是从 $\mathcal{G}$ 中检索与问题相关的证据链集合
+ $\mathcal{C}_q = \{C_1, C_2, \dots, C_k\}$。在此基础上，定义生成函数：
+\begin{equation}
+f(\text{LLMs} \mid q, \mathcal{C}_q) \rightarrow \mathcal{A}_q
+\end{equation}
+
+其中，$\mathcal{A}_q$ 表示针对问题 $q$ 生成的答案。通过利用结构化的证据链 $\mathcal{C}_q$，
+模型能够在显式推理路径的引导下完成答案生成，从而提升生成结果的可解释性与可靠性。
+
+\subsection{文档检索与知识图谱构建}[Document Retrieval and Knowledge Graph Construction]
+
+给定用户查询 $q$ 和文档集合 $\mathcal{D}$，TTRAG 首先使用检索器 $\mathcal{R}$ 从文档集合 $\mathcal{D}$ 中
+检索出与查询最相关的前 $k$ 个文档，记为：
+\begin{equation}
+\mathcal{D}_k = \mathcal{R}(q, \mathcal{D}, k)
+\end{equation}
+
+其中，$\mathcal{D}_k = \{d_1, d_2, \dots, d_k\}$ 表示按相关性排序的前 $k$ 个文档集合。
+
+检索器 $\mathcal{R}$ 可以是基于向量相似度的稠密检索模型，也可以是针对检索增强生成任务优化的检索模型。
+具体而言，首先将查询 $q$ 与文档集合 $\mathcal{D}$ 编码为高维向量表示：
+\begin{equation}
+\mathbf{q} = \text{Enc}(q), \quad \mathbf{d}_i = \text{Enc}(d_i)
+\end{equation}
+
+随后，通过计算查询向量与文档向量之间的相似度（如余弦相似度）：
+\begin{equation}
+\text{sim}(q, d_i) = \frac{\mathbf{q} \cdot \mathbf{d}_i}{\|\mathbf{q}\| \cdot \|\mathbf{d}_i\|}
+\end{equation}
+
+并选取得分最高的前 $k$ 个文档构成集合 $\mathcal{D}_k$，作为后续知识图谱构建的文本基础。
+
+在获得相关文档集合 $\mathcal{D}_k$ 后，本文利用大语言模型执行OpenIE。
+具体而言，采用基于上下文学习的提示方式，将大语言模型作为知识图谱生成器 $g$，从每个文档中抽取实体关系三元组。
+知识图谱构建提示模板如\figref{fig:kg_prompt}所示。
+
+\begin{figure}[htbp]
+  \centering
+  \begin{minipage}{0.9\textwidth}
+  \begin{tcolorbox}[title=知识图谱构建提示模板]
+  \small
+  给定标题与文本，从文本中抽取所有知识三元组，形式为 
+  \textless 标题；关系；尾实体\textgreater，其中标题为给定标题，尾实体为文本中的短语，关系表示标题与尾实体之间的语义关系。
+
+  \vspace{5pt}
+  \texttt{In-Context Few-shot}
+
+  \vspace{5pt}
+  标题：\{Title\}
+
+  文本：\{Text\}
+
+  知识三元组：
+  \end{tcolorbox}
+  \end{minipage}
+  \caption{知识图谱构建提示模板}
+  \label{fig:kg_prompt}
+\end{figure}
+
+对于每个文档 $d_i \in \mathcal{D}_k$，生成对应的三元组集合：
+\begin{equation}
+\mathcal{T}_i = g(d_i)
+\end{equation}
+
+其中，$\mathcal{T}_i = \{(h, r, t)\}$ 表示从文档 $d_i$ 中抽取的实体关系三元组集合。
+
+通过对所有文档的三元组集合进行聚合，得到完整的三元组集合：
+\begin{equation}
+\mathcal{T}_D = \bigcup_{i=1}^{k} \mathcal{T}_i
+\end{equation}
+
+进一步地，可构建对应的知识图谱：
+\begin{equation}
+\mathcal{G}_D = (\mathcal{E}_D, \mathcal{R}_D, \mathcal{T}_D)
+\end{equation}
+
+其中，$\mathcal{E}_D$ 和 $\mathcal{R}_D$ 分别表示由三元组集合 $\mathcal{T}_D$ 推导得到的实体集合与关系集合。
+
+在构建知识图谱的过程中，本文进一步为每个三元组建立其与原始文本的映射关系。具体而言，对于每个三元组 $(h, r, t)$，
+记录其对应的原始文档、段落以及句子级别的位置索引，从而实现三元组与文本之间的可追溯关联。
+该设计使得后续方法（见第3.4节）能够基于三元组骨架高效地回溯并引入相关文本信息，实现结构化知识与非结构化文本的深度融合。
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.98 \textwidth]{TTRAG_framework.png}
+  \caption{检索与初始化：模型根据问题提取最相关的文档，然后从文档中提取图信息并构建相应的图。
+  推理路径：对图中的路径进行剪枝以构建推理链，并对相关文档进行索引。使用 Llama-3-8B-Instruct 进行束搜索。
+  最后构建模型需要回答的上下文}
+  \label{fig：TTRAG_framework}
+\end{figure}
+
+\section{三元组骨架构建方法}[Reasoning Skeleton Construction]
+
+如\figref{fig：TTRAG_framework}所示，在构建文档级知识图谱 $\mathcal{G}_D = (\mathcal{E}_D, \mathcal{R}_D, 
+\mathcal{T}_D)$ 的基础上，本文进一步提出一种基于三元组路径的推理骨架构建方法，用于支持多跳推理过程。
+所谓推理骨架，是由一系列有序连接的知识三元组构成的路径结构，能够刻画从问题到答案的逐步推理过程。
+TTRAG通过迭代式路径扩展、基于大语言模型的三元组选择以及束搜索策略，实现了高效且可靠的推理骨架构建。
+
+
+\subsection{三元组表示与编码}[Triple Representation and Encoding]
+
+给定问题 $q$ 及其对应的三元组集合 $\mathcal{T}_D = \{t_1, t_2, \dots, t_n\}$，其中每个三元组表示为 $t=(h,r,o)$，
+本文首先将所有三元组编码为稠密向量表示：
+\begin{equation}
+\mathbf{E}_T = \{ \mathbf{e}_{t_1}, \dots, \mathbf{e}_{t_n} \}
+\end{equation}
+
+该编码过程通过预训练语义编码模型实现，并在整个推理过程中复用，从而避免重复计算，提高整体效率。
+
+\subsection{迭代式路径扩展}[Iterative Path Expansion]
+
+推理骨架通过逐步扩展路径的方式构建。在第 $j$ 跳（hop）时，当前部分路径可表示为：
+\begin{equation}
+\mathcal{P}^{(j)} = \{ t_{p_1}, \dots, t_{p_j} \}
+\end{equation}
+
+为了结合已有推理信息与原始问题，本文将当前路径与问题进行拼接，构造新的查询：
+\begin{equation}
+q^{(j)} = \text{Concat}(\mathcal{P}^{(j)}, q)
+\end{equation}
+
+并将其编码为查询向量 $\mathbf{e}_{q^{(j)}}$。随后，通过计算查询向量与候选三元组向量之间的相似度（采用内积形式）：
+\begin{equation}
+s_i^{(j)} = \mathbf{e}_{q^{(j)}}^\top \mathbf{e}_{t_i}
+\end{equation}
+
+得到每个候选三元组的相关性得分。
+
+为避免路径中出现重复三元组，本文对当前路径中已选取的三元组进行掩码处理。随后选取得分最高的前 $m$ 个三元组构成候选集合：
+\begin{equation}
+\mathcal{C}^{(j)} = \text{Top-}m(\{s_i^{(j)}\})
+\end{equation}
+
+该过程实现了基于语义匹配的候选路径扩展。
+
+\subsection{基于大语言模型的三元组选择}[LLM-guided Triple Selection]
+
+在获得候选三元组集合 $\mathcal{C}^{(j)}$ 后，本文进一步引入大语言模型对候选路径进行语义判断。
+具体而言，将当前路径 $\mathcal{P}^{(j)}$ 与候选集合构造成多选提示（multi-choice prompt），
+并利用开源大语言模型作为三元组选择器。推理骨架构建提示模板如\figref{fig:skeleton_prompt}所示。
+
+\begin{figure}[htbp]
+  \centering
+  \begin{minipage}{0.9\textwidth}
+  \begin{tcolorbox}[title=推理骨架构建提示模板]
+  \small
+  从候选知识三元组中选择一个最合适的三元组，用于扩展当前推理路径，使其能够逐步回答给定问题。如果当前路径已经足够回答问题，则输出 STOP。请仅输出选择结果。
+  
+  \vspace{5pt}
+  \texttt{In-Context Few-shot}
+  
+  \vspace{5pt}
+  当前路径中的三元组：
+  
+  \{Existing Knowledge Triples\}
+  
+  问题：
+  
+  \{Question\}
+  
+  候选三元组：
+  
+  \{Candidate Knowledge Triples\}
+  
+  下一步选择：
+  \end{tcolorbox}
+  \end{minipage}
+  \caption{推理骨架构建提示模板}
+  \label{fig:skeleton_prompt}
+\end{figure}
+
+模型输出每个候选三元组的选择概率，以及一个特殊的终止选项 $\text{STOP}$：
+\begin{equation}
+P(c \mid \mathcal{P}^{(j)}, q), \quad c \in \mathcal{C}^{(j)} \cup \{\text{STOP}\}
+\end{equation}
+
+当模型选择 $\text{STOP}$ 时，表示当前推理路径已经完成。
+
+该机制结合了语义相似度与语言模型的推理能力，使路径扩展更加符合自然语言语义逻辑。
+
+\subsection{基于束搜索的并行路径扩展}[Beam Search-based Expansion]
+
+为同时探索多条潜在推理路径，本文采用束搜索（Beam Search）策略，在每一步最多保留 $B$ 条候选路径。
+
+对于每一条未完成路径，从候选集合中选取概率最高的前 $M$ 个扩展分支，并计算路径的累积得分：
+\begin{equation}
+\text{Score}(\mathcal{P}^{(j+1)}) = \text{Score}(\mathcal{P}^{(j)}) \cdot P(c \mid \mathcal{P}^{(j)}, q)
+\end{equation}
+
+同时，为抑制低质量路径的扩展，本文引入阈值 $\delta$，过滤掉概率低于该阈值的候选分支，从而减少噪声传播。
+
+所有扩展路径按照累积得分进行排序，并保留前 $B$ 条路径进入下一轮扩展。
+
+\subsection{路径终止与骨架生成}[Termination and Skeleton Generation]
+
+当满足以下任一条件时，路径被标记为完成：
+\begin{itemize}
+\item 模型选择 $\text{STOP}$；
+\item 达到预设定的超参数最大跳数 $L$。
+\end{itemize}
+
+最终得到的推理骨架集合表示为：
+\begin{equation}
+\mathcal{S} = \{ (\mathcal{P}_1, s_1), \dots, (\mathcal{P}_B, s_B) \}
+\end{equation}
+
+其中，$\mathcal{P}_i$ 表示一条推理路径，$s_i$ 表示其对应的置信得分。
+
+上述推理骨架为后续答案生成提供了结构化、可解释的推理依据，同时显著提升了推理过程的可靠性与可控性。
+
+\section{基于三元组骨架的上下文证据索引}[Contextual Evidence Indexing based on Reasoning Skeleton]
+\subsection{文本证据索引}[Textual Evidence Indexing]
+
+在第3.2节的知识图谱构建过程中，本文利用大语言模型作为知识图谱生成器 $g$，
+对检索得到的文档集合 $\mathcal{D}_k$ 构建文档级知识图谱。
+具体而言，对于每个文档，构建对应的知识图谱子图，并为每个三元组记录其来源信息，包括原始文档、段落以及句子级别的位置索引。
+
+在推理骨架 $\mathcal{S}$ 构建完成后，本文进一步引入文本证据以增强语义表达能力。
+对于骨架中的每一个三元组 $\tau = (h, r, t)$，定义其对应的文本映射函数为：
+\begin{equation}
+\mathcal{M}(\tau) = \{ d_\tau, p_\tau, s_\tau \}
+\end{equation}
+
+其中，$d_\tau$ 表示三元组来源文档，$p_\tau$ 表示对应段落，$s_\tau$ 表示包含该三元组语义信息的文本信息。
+
+基于该映射关系，可以从原始文档中精确定位与三元组相关的文本证据。
+进一步地，对于一条推理路径 $\mathcal{P} = \{ \tau_1, \tau_2, \dots, \tau_l \}$，其对应的文本证据集合定义为：
+\begin{equation}
+\mathcal{E}(\mathcal{P}) = \bigcup_{i=1}^{l} \mathcal{M}(\tau_i)
+\end{equation}
+
+\figref{句子过滤图.png} 展示了检索到的原始文本块中过滤出仅包含知识的句子的方式。
+通过仅保留包含核心知识的句子，本文方法在保证语义完整性的同时，能够显著减少无关文本信息干扰，提高知识密度，
+从而大辐减少上下文长度，即最终输入LLM的提示词长度,为后续答案生成提供更加精确且可解释的输入。
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.98 \textwidth]{句子过滤图.png}
+  \caption{利用三元组骨架过滤原始文本段落得到包含知识的句子}
+  \label{句子过滤图.png}
+\end{figure}
+
+\subsection{证据链编排}[Evidence Chain Organization]
+
+在完成推理骨架构建与上下文证据索引后，TTRAG 将结构化知识与文本证据进行融合，
+并与用户问题共同构建提示（Prompt），输入至大语言模型以生成最终答案。该过程可形式化表示为：
+\begin{equation}
+\mathcal{A}_q = f_{\text{LLM}}(q, \mathcal{S}, \mathcal{C})
+\end{equation}
+
+其中，$f_{\text{LLM}}(\cdot)$ 表示作为答案生成器的大语言模型，
+$\mathcal{A}_q$ 表示模型输出的最终答案，$q$ 表示用户查询，
+$\mathcal{S}$ 表示推理骨架集合，$\mathcal{C}$ 表示基于推理骨架索引得到的上下文证据文本。
+
+与传统基于图的RAG方法不同，后者通常仅对检索到的子图进行线性拼接或简单摘要，忽略了证据链的逻辑结构，
+同时引入大量冗余信息。本文提出一种结构引导的协同推理机制，使大语言模型能够在显式推理路径的约束下进行动态、渐进式推理，
+从而提升答案的准确性与连贯性。
+
+在获得推理骨架及其对应的文本证据后，本文首先对证据链进行结构化编排。具体而言，按照推理路径中三元组的顺序，
+对其对应的文本片段进行组织与拼接，从而构建逻辑连贯的上下文表示：
+\begin{equation}
+\mathcal{C} = \text{Concat}(s_{\tau_1}, s_{\tau_2}, \dots, s_{\tau_l})
+\end{equation}
+
+与传统基于检索文档的RAG方法直接拼接完整检索文档不同，该过程将离散的结构化知识与非结构化文本信息进行融合，从而有效过滤冗余信息，
+使推理过程以自然语言形式呈现。该策略能够显著提升上下文的知识密度，降低无关信息的干扰，
+同时大幅减少输入到大语言模型中的提示词长度，从而为后续问答提供清晰且可追溯的证据支持。
+
+\subsection{最终答案生成}[Final Answer Generation]
+
+在构建完成提示后，输入大语言模型进行答案生成。该过程包含以下两个阶段：
+\begin{itemize}
+\item 首先，大语言模型对当前证据进行充分性判断，即评估推理骨架与文本证据是否能够完整回答用户问题。当证据充足时，
+模型基于结构化推理路径生成一个全面且符合逻辑的答案。
+\item 当模型判断当前证据不足以支持完整推理时，可以触发进一步的推理与探索过程（如扩展推理路径或补充证据）。
+在多轮推理仍未获得明确结论的情况下，模型将综合已有证据与其内在知识，生成最合理的答案。
+\end{itemize}
+
+上述机制实现了基于结构化证据的动态问答过程，有效提升了答案生成的准确性、连贯性与鲁棒性。
 
 \section{本章小结}[Brief summary]
 
-\lipsum[1]
+
