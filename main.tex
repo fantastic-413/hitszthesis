@@ -20,8 +20,8 @@
 %%=============================================
 
 % 设置文档类别为 <hitszthesis>
-\documentclass[type=doctor]{hitszthesis}
-% \documentclass[type=master]{hitszthesis}
+% \documentclass[type=doctor]{hitszthesis}
+\documentclass[type=master]{hitszthesis}
 % \documentclass[type=bachelor,infoleft=true]{hitszthesis}
 
 % 模板提供以下选项，各个选项之间不要有空格
@@ -90,22 +90,26 @@
 \mainmatter
 
 % 第1章
-\input{body/chapter01}
+% \input{body/chapter01}
+\input{body/myChapter01.tex}
 
 % 第2章
-\input{body/chapter02}
+% \input{body/chapter02}
+\input{body/myChapter02.tex}
 
 % 第3章
-\input{body/chapter03}
+% \input{body/chapter03}
+\input{body/myChapter03.tex}
 
 % 第4章
-\input{body/chapter04}
+% \input{body/chapter04}
+\input{body/myChapter04.tex}
 
 % 第5章
-\input{body/chapter05}
+% \input{body/chapter05}
 
 % 第6章
-\input{body/chapter06}
+% \input{body/chapter06}
 
 % 开始写正文之后的部分
 \backmatter
@@ -154,10 +158,10 @@
 \bibliography{reference}
 
 % 附录
-\begin{appendix}
-  \input{back/appendixA.tex}
-  \input{back/appendixB.tex}
-\end{appendix}
+% \begin{appendix}
+%   \input{back/appendixA.tex}
+%   \input{back/appendixB.tex}
+% \end{appendix}
 
 % 发表文章
 \input{back/publications}
@@ -175,7 +179,7 @@
 \input{back/acknowledgements}
 
 % 个人简介
-\input{back/resume}
+% \input{back/resume}
 
 %%%% \end{硕博书序}
 
