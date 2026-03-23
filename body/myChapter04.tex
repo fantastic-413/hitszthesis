@@ -1,152 +1,401 @@
 % !TEX root = ../main.tex
 
 % 中英标题：\chapter{中文标题}[英文标题]
-\chapter{排版表格}[Typesetting tables]
+\chapter{基于联合语义建模的检索增强生成方法}[Joint Semantic Modeling-based RAG]
 
 \section{引言}[Introduction]
 
-表应有自明性。表格不加左、右边线。表的编排建议采用国际通行的三线表。表中文字用宋
-体~5~号字。每个表格均应有表题（由表序和表名组成）。表序一般按章编排，如第~1~章第
-一个插表的序号为“表~1-1”等。表序与表名之间空一格，表名中不允许使用标点符号，表名
-后不加标点。表题置于表上，硕士学位论文只用中文，博士学位论文用中、英文两种文字居
-中排写，中文在上，要求中文用宋体~5~号字，英文用新罗马字体~5~号字。表头设计应简单
-明了，尽量不用斜线。表头中可采用化学符号或物理量符号。
+近年来，检索增强生成（Retrieval-Augmented Generation, RAG）通过引入外部知识，
+有效缓解了大语言模型在知识更新与事实准确性方面的局限。
+然而，在复杂多跳问答任务中，如何在保证检索精度的同时降低上下文噪声，仍然是当前研究面临的关键挑战。
 
-\section{普通表格的绘制方法}[Methods of drawing normal tables]
+针对这一问题，基于知识图谱的 GraphRAG\cite{graphrag} 方法通过显式建模实体及其关系，构建结构化知识以支持多跳推理。
+典型方法如 GraphRAG 通过社区划分与分层摘要实现由粗到细的检索过程，
+后续工作（如 GFM-RAG\cite{gfm-rag}、GRetriever\cite{g-retriever} 与 LightRAG\cite{lightrag}）进一步引入图神经网络、
+结构优化目标及多级索引机制，
+在一定程度上提升了推理能力与检索效率。此外，HippoRAG 及其改进版本 HippoRAG2 从认知机制出发，
+结合个性化 PageRank 实现多跳检索，增强了上下文建模能力。
 
-表格应具有三线表格式，因此需要调用~booktabs~宏包，其标准格式如表~\ref{table1}~所示。
-\begin{table}[htbp]
-\bicaption[table1]{}{符合研究生院绘图规范的表格}{Table$\!$}{Table in agreement of the standard from graduate school}
-\vspace{0.5em}\centering\wuhao
-\begin{tabular}{ccccc}
-\toprule[1.5pt]
-$D$(in) & $P_u$(lbs) & $u_u$(in) & $\beta$ & $G_f$(psi.in)\\
-\midrule[1pt]
- 5 & 269.8 & 0.000674 & 1.79 & 0.04089\\
-10 & 421.0 & 0.001035 & 3.59 & 0.04089\\
-20 & 640.2 & 0.001565 & 7.18 & 0.04089\\
-\bottomrule[1.5pt]
-\end{tabular}
-\end{table}
-全表如用同一单位，则将单位符号移至表头右上角，加圆括号。表中数据应准确无误，书写
-清楚。数字空缺的格内加横线“－”（占~2~个数字宽度）。表内文字或数字上、下或左、右
-相同时，采用通栏处理方式，不允许用“〃”、“同上”之类的写法。表内文字说明，起行空一
-格、转行顶格、句末不加标点。如某个表需要转页接排，在随后的各页上应重复表的编号。
-编号后加“（续表）”，表题可省略。续表应重复表头。
+然而，现有研究表明，GraphRAG 方法在实际应用中往往难以稳定优于传统 RAG。
+这一问题的根本原因在于自动构建知识图谱的质量难以保证：一方面，关系抽取过程存在误差，导致局部语义关系不准确；
+另一方面，缺乏全局一致性约束，使得图结构呈现碎片化特征。这些问题共同引入结构冲突与语义歧义，从而削弱检索结果的有效性。
 
-\section{长表格的绘制方法}[Methods of drawing long tables]
+为降低关系建模带来的不稳定性，LinearRAG\cite{linearrag} 提出以“线性图”为核心的轻量化建模方式，通过仅建模实体与文本之间的语义关联，
+实现无需关系抽取的高效检索框架。该方法基于分层语义结构与两阶段检索机制，在多跳问答任务中取得了较好的性能与效率表现。
 
-长表格是当表格在当前页排不下而需要转页接排的情况下所采用的一种表格环境。若长表格
-仍按照普通表格的绘制方法来获得，其所使用的\verb|table|浮动环境无法实现表格的换页
-接排功能，表格下方过长部分会排在表格第1页的页脚以下。为了能够实现长表格的转页接
-排功能，需要调用~longtable~宏包，由于长表格是跨页的文本内容，因此只需要单独的
-\verb|longtable|环境，所绘制的长表格的格式如表~\ref{table2}~所示。
+尽管 LinearRAG 在效率与鲁棒性方面具有优势，但其仍存在若干局限：
+首先，仅依赖实体级语义信息，难以覆盖更丰富的语义表达单元（如短语级概念）；
+其次，段落表示通常基于整体编码，忽略句子层级的重要性差异，限制了表示精度；
+此外，其上下文构建仍以单一语义来源为主，缺乏对多粒度信息的统一建模能力。
 
-注意，长表格双语标题的格式。
+为此，本章在 LinearRAG 框架基础上，提出一种基于联合语义建模的检索增强生成方法
+——\textbf{J}oint \textbf{S}emantic LinearRAG（\textbf{JS-LinearRAG}）。
+该方法从多粒度语义建模与融合的角度出发，对原有流程进行系统性改进，主要包括以下三个方面：
 
-\vspace{-1.5bp}
-\ltfontsize{\wuhao[1.667]}
-\wuhao[1.667]\begin{longtable}{ccc}%
-\longbionenumcaption{}{{\wuhao 中国省级行政单位一览
-}\label{table2}}{Table$\!$}{}{{\wuhao Overview of the provincial administrative
-unit of China}}{-0.5em}{3.15bp}\\
-%\caption{\wuhao 中国省级行政单位一览}\\
-\toprule[1.5pt] 名称 & 简称 & 省会或首府  \\ \midrule[1pt]
-\endfirsthead
-\multicolumn{3}{r}{表~\thetable（续表）}\vspace{0.5em}\\
-\toprule[1.5pt] 名称 & 简称 & 省会或首府  \\ \midrule[1pt]
-\endhead
-\bottomrule[1.5pt]
-\endfoot
-北京市 & 京 & 北京\\
-天津市 & 津 & 天津\\
-河北省 & 冀 & 石家庄市\\
-山西省 & 晋 & 太原市\\
-内蒙古自治区 & 蒙 & 呼和浩特市\\
-辽宁省 & 辽 & 沈阳市\\
-吉林省 & 吉 & 长春市\\
-黑龙江省 & 黑 & 哈尔滨市\\
-上海市 & 沪/申 & 上海\\
-江苏省 & 苏 & 南京市\\
-浙江省 & 浙 & 杭州市\\
-安徽省 & 皖 & 合肥市\\
-福建省 & 闽 & 福州市\\
-江西省 & 赣 & 南昌市\\
-山东省 & 鲁 & 济南市\\
-河南省 & 豫 & 郑州市\\
-湖北省 & 鄂 & 武汉市\\
-湖南省 & 湘 & 长沙市\\
-广东省 & 粤 & 广州市\\
-广西壮族自治区 & 桂 & 南宁市\\
-海南省 & 琼 & 海口市\\
-重庆市 & 渝 & 重庆\\
-四川省 & 川/蜀 & 成都市\\
-贵州省 & 黔/贵 & 贵阳市\\
-云南省 & 云/滇 & 昆明市\\
-西藏自治区 & 藏 & 拉萨市\\
-陕西省 & 陕/秦 & 西安市\\
-甘肃省 & 甘/陇 & 兰州市\\
-青海省 & 青 & 西宁市\\
-宁夏回族自治区 & 宁 & 银川市\\
-新疆维吾尔自治区 & 新 & 乌鲁木齐市\\
-香港特别行政区 & 港 & 香港\\
-澳门特别行政区 & 澳 & 澳门\\
-台湾省 & 台 & 台北市\\
-\end{longtable}\normalsize
-\vspace{-1em}
+\begin{itemize}
+\item \textbf{多粒度语义抽取机制}：在语义抽取阶段，引入实体与短语的联合抽取，
+从单一实体扩展至多粒度语义单元，以增强语义表达能力；
 
-此长表格~\ref{table2}~第~2~页的标题“编号（续表）”和表头是通过代码自动添加上去的，无需人工添加，若表格在页面中的竖直位置发生了变化，长表格在第~2~页
-及之后各页的标题和表头位置能够始终处于各页的最顶部，也无需人工调整，\LaTeX~系统的这一优点是~word~等软件所无法比拟的。
+\item \textbf{基于句子加权的段落表示}：在表示学习阶段，通过对句子嵌入进行加权聚合，
+刻画段落内部的语义重要性分布，从而提升段落表示的精细度；
 
-\section{列宽可调表格的绘制方法}[Methods of drawing tables with adjustable-width columns]
-论文中能用到列宽可调表格的情况共有两种，一种是当插入的表格某一单元格内容过长以至
-于一行放不下的情况，另一种是当对公式中首次出现的物理量符号进行注释的情况，这两种
-情况都需要调用~tabularx~宏包。下面将分别对这两种情况下可调表格的绘制方法进行阐述
-。
-\subsection{表格内某单元格内容过长的情况}[The condition when the contents in
-some cells of tables are too long]
-首先给出这种情况下的一个例子如表~\ref{table3}~所示。
-\begin{table}[htbp]
+\item \textbf{联合语义上下文构建范式}：在上下文构建阶段，将实体、短语及段落信息进行统一组织，
+形成高密度、多粒度的语义上下文，以提升模型的理解与推理能力。
+\end{itemize}
+
+\begin{figure}[htbp]
   \centering
-\bicaption[table3]{}{最小的三个正整数的英文表示法}{Table$\!$}{The English construction of the smallest three positive integral numbers}\vspace{0.5em}\wuhao
-\begin{tabularx}{0.7\textwidth}{llX}
-\toprule[1.5pt]
-Value & Name & Alternate names, and names for sets of the given size\\\midrule[1pt]
-1 & One & ace, single, singleton, unary, unit, unity\\
-2 & Two & binary, brace, couple, couplet, distich, deuce, double, doubleton, duad, duality, duet, duo, dyad, pair, snake eyes, span, twain, twosome, yoke\\
-3 & Three & deuce-ace, leash, set, tercet, ternary, ternion, terzetto, threesome, tierce, trey, triad, trine, trinity, trio, triplet, troika, hat-trick\\\bottomrule[1.5pt]
-\end{tabularx}
-\end{table}
-tabularx环境共有两个必选参数：第1个参数用来确定表格的总宽度，第2个参数用来确定每
-列格式，其中标为X的项表示该列的宽度可调，其宽度值由表格总宽度确定。标为X的列一般
-选为单元格内容过长而无法置于一行的列，这样使得该列内容能够根据表格总宽度自动分行
-。若列格式中存在不止一个X项，则这些标为X的列的列宽相同，因此，一般不将内容较短的
-列设为X。标为X的列均为左对齐，因此其余列一般选为l（左对齐），这样可使得表格美观
-，但也可以选为c或r。
+  \includegraphics[width=0.98\textwidth]{JSLinearRAG对比.png}
+  \caption{四种 RAG 范式的对比分析}
+  \label{fig：JSLinearRAG对比}
+\end{figure}
 
-\subsection{排版横版表格的举例}[An example of landscape table]
+与第三章提出的基于三元组骨架引导的 TTRAG 方法不同，本章方法不依赖显式的结构化推理路径，
+而是通过多粒度语义信息的协同建模，实现对检索内容的精细表达与高效利用。
+该方法为在轻量化建模框架下提升多跳推理能力提供了一种新的解决思路。
 
-横版表格如\tabref{table4}所示。
+\section{多粒度语义信息抽取}[Multi-granularity Semantic Extraction]
 
-\begin{table}[p]
-\centering
-  \begin{sideways}
-    \begin{minipage}{\textheight}
-      \bicaption[table4]{}{不在规范中规定的横版表格}{Table$\!$}{A table style which is not stated in the regulation}
-      \vspace{0.5em}\centering\wuhao
-      \begin{tabular}{ccccc}
-        \toprule[1.5pt]
-        $D$(in) & $P_u$(lbs) & $u_u$(in) & $\beta$ & $G_f$(psi.in)\\
-        \midrule[1pt]
-        5 & 269.8 & 0.000674 & 1.79 & 0.04089\\
-        10 & 421.0 & 0.001035 & 3.59 & 0.04089\\
-        20 & 640.2 & 0.001565 & 7.18 & 0.04089\\
-        \bottomrule[1.5pt]
-      \end{tabular}
-    \end{minipage}
-  \end{sideways}
-\end{table}
+在 LinearRAG 中，语义建模主要依赖实体（Entity）作为基本语义单元。然而，仅使用实体往往难以充分表达文本中的复杂语义关系，
+尤其是在多跳问答场景中，关键语义信息常以短语（Phrase）的形式存在，例如名词短语或概念性表达。
+因此，仅依赖实体级表示会导致语义覆盖不足，从而影响后续检索与推理效果。
+
+为此，本章提出一种多粒度语义信息抽取方法，在传统实体抽取的基础上，引入短语级语义单元，从而构建更加丰富的语义表示。
+
+\subsection{任务定义}
+
+给定检索得到的文档集合 $\mathcal{D}_k = \{d_1, d_2, \dots, d_k\}$，其中每个文档 $d_i$ 由若干句子组成。
+本章的目标是从文档中抽取多粒度语义单元集合 $\mathcal{U}$，包括实体集合 $\mathcal{E}$ 与短语集合 $\mathcal{P}$：
+
+\begin{equation}
+\mathcal{U} = \mathcal{E} \cup \mathcal{P}
+\end{equation}
+
+其中：
+\begin{itemize}
+\item $\mathcal{E}$ 表示通过命名实体识别（Named Entity Recognition, NER）抽取的实体集合；
+\item $\mathcal{P}$ 表示从文本中抽取的短语集合，用于补充实体无法覆盖的语义信息。
+\end{itemize}
+
+\subsection{实体抽取}
+
+对于每个文档 $d_i \in \mathcal{D}_k$，首先使用命名实体识别模型对文本进行处理，抽取实体集合：
+
+\begin{equation}
+\mathcal{E}_i = \text{NER}(d_i)
+\end{equation}
+
+其中，$\text{NER}(\cdot)$ 表示实体识别函数。为提高语义质量，本章过滤掉数值类或序数类实体（如 CARDINAL、ORDINAL），
+仅保留具有实际语义意义的实体。
+
+最终实体集合定义为：
+
+\begin{equation}
+\mathcal{E} = \bigcup_{i=1}^{k} \mathcal{E}_i
+\end{equation}
+
+\subsection{短语抽取}
+
+为弥补实体抽取在语义表达上的不足，本章进一步从文本中抽取短语信息。具体地，
+采用基于依存句法分析的名词短语提取方法（noun chunks），从句子中抽取具有语义完整性的短语单元：
+
+\begin{equation}
+\mathcal{P}_i = \text{Chunk}(d_i)
+\end{equation}
+
+其中，$\text{Chunk}(\cdot)$ 表示短语抽取函数。
+
+与实体不同，短语通常包含更丰富的上下文语义，例如“climate change policy”或“neural network architecture”等。
+这些短语能够提供更细粒度的语义信息，有助于提升检索的准确性。
+
+最终短语集合定义为：
+
+\begin{equation}
+\mathcal{P} = \bigcup_{i=1}^{k} \mathcal{P}_i
+\end{equation}
+
+\subsection{多粒度语义融合}
+
+在获得实体集合 $\mathcal{E}$ 与短语集合 $\mathcal{P}$ 后，本章将两者进行统一建模，构建多粒度语义表示：
+
+\begin{equation}
+\mathcal{U} = \{u_1, u_2, \dots, u_n\}, \quad u_i \in \mathcal{E} \cup \mathcal{P}
+\end{equation}
+
+为避免冗余与噪声，本章对语义单元进行去重与过滤处理，包括：
+\begin{itemize}
+\item 去除重复语义单元；
+\item 过滤过短或无实际语义的信息；
+\item 保留与查询相关性较高的语义单元。
+\end{itemize}
+
+通过上述处理，最终得到的多粒度语义集合 $\mathcal{U}$ 能够同时包含实体级与短语级信息，
+从而在语义表达能力与信息覆盖范围之间取得平衡。
+
+相比仅使用实体的 LinearRAG，本章方法通过引入短语级语义单元，有效提升了语义表达的丰富性与完整性。具体优势体现在以下几个方面：
+
+\begin{itemize}
+\item \textbf{语义覆盖增强}：短语能够补充实体无法表达的概念信息；
+\item \textbf{语义粒度提升}：多粒度建模使得语义表示更加细致；
+\item \textbf{检索精度提升}：更丰富的语义单元有助于提升语义匹配能力。
+\end{itemize}
+
+该多粒度语义抽取方法为后续的段落表示与上下文构建提供了更加丰富且高质量的语义基础。
+
+\section{基于句子加权的段落表示方法}[Sentence-weighted Paragraph Representation]
+
+在传统的检索增强生成方法中，段落通常通过整体编码或简单平均池化（mean pooling）的方式进行表示。
+然而，这种方式忽略了段落内部句子在语义表达上的差异性，使得重要信息可能被稀释，从而影响检索精度与后续推理效果。
+
+为此，本章提出一种基于句子加权的段落表示方法，通过在句子层面对语义信息进行建模，并基于句子重要性进行加权聚合，
+从而获得更加精细的段落表示。
+
+\subsection{预备知识}
+
+给定文档集合 $\mathcal{D}_k$，每个文档 $d_i$ 由若干句子组成：
+
+\begin{equation}
+d_i = \{s_{i1}, s_{i2}, \dots, s_{i n_i}\}
+\end{equation}
+
+其中 $s_{ij}$ 表示文档 $d_i$ 中的第 $j$ 个句子，$n_i$ 表示句子数量。本章的目标是构建段落表示向量 $\mathbf{e}_{d_i}$，
+使其能够更准确地反映段落的语义结构。
+
+\subsection{句子级语义表示}
+
+首先，对每个句子进行编码，得到其向量表示：
+
+\begin{equation}
+\mathbf{e}_{s_{ij}} = \text{Encoder}(s_{ij})
+\end{equation}
+
+其中，$\text{Encoder}(\cdot)$ 表示文本编码模型（如 E5、BGE 等）。相比直接对整个段落编码，
+句子级编码能够保留更细粒度的语义信息。
+
+\subsection{句子权重建模}
+
+考虑到不同句子在段落中的信息量存在差异，本章采用基于句子长度的权重分配策略。具体地，将句子的词数作为其重要性度量：
+
+\begin{equation}
+w_{ij} = \frac{|s_{ij}|}{\sum_{k=1}^{n_i} |s_{ik}|}
+\end{equation}
+
+其中 $|s_{ij}|$ 表示句子 $s_{ij}$ 的词数，$w_{ij}$ 表示归一化后的权重。
+
+该设计基于如下直观假设：较长的句子通常包含更多语义信息，因此在段落表示中应赋予更高权重。
+
+\subsection{段落表示构建}
+
+在获得句子表示与对应权重后，本章通过加权聚合的方式构建段落表示：
+
+\begin{equation}
+\mathbf{e}_{d_i} = \sum_{j=1}^{n_i} w_{ij} \cdot \mathbf{e}_{s_{ij}}
+\end{equation}
+
+该表示方式能够根据句子的重要性对语义进行重构，从而避免简单平均带来的信息稀释问题。
+
+与传统的段落表示方法相比，本章提出的句子加权方法具有以下优势：
+
+\begin{itemize}
+\item \textbf{细粒度语义建模}：通过句子级编码保留段落内部的语义结构；
+\item \textbf{重要性建模}：基于句子长度分配权重，使关键信息获得更高贡献；
+\item \textbf{鲁棒性提升}：减少无关或冗余句子对整体表示的干扰。
+\end{itemize}
+
+此外，基于句子加权的段落表示方法无需引入额外训练参数，计算开销较低，易于集成到现有检索框架中。
+基于句子加权的段落表示方法能够在保证效率的前提下显著提升语义表示质量，为后续的语义检索与上下文构建提供更加精确的基础。
+
+\section{联合语义上下文构建方法}[Joint Semantic Context Construction]
+
+在完成多粒度语义信息抽取（第4.2节）与基于句子加权的段落表示（第4.3节）后，
+如何将不同粒度的语义信息进行有效融合，以构建高质量上下文，是影响检索增强生成性能的关键因素。
+
+传统 RAG 方法通常仅使用段落级文本作为上下文，而 LinearRAG 虽引入实体信息，
+但其上下文仍以文本段落这一单一语义来源为主，缺乏对多粒度语义信息的统一建模。
+这种单一语义来源的上下文构建方式，限制了模型对复杂语义关系的理解能力。
+
+为此，本章提出一种联合语义上下文构建方法，将实体、短语与段落三类语义信息进行统一组织，形成多粒度、高密度的上下文表示。
+值得注意的是，本章提出的联合语义上下文构建方法在设计思想上受到第三章 TTRAG 方法的启发。
+TTRAG 通过构建显式的三元组推理骨架，并结合文本证据进行逐步扩展，实现了结构化知识与非结构化文本的有效融合。
+
+与之类似，本章方法同样遵循“结构引导 + 语义补充”的核心思想，但在实现路径上进行了进一步简化与泛化：
+不再显式构建推理路径，而是通过实体、短语与段落的多粒度语义融合，在隐式语义空间中引导模型完成推理过程。
+相比显式推理骨架，该方法具有更低的构建成本与更强的灵活性，同时仍能够保持较高的信息密度与推理能力。
+
+\subsection{语义单元检索}
+
+基于前述构建的语义单元集合 $\mathcal{U} = \mathcal{E} \cup \mathcal{P}$ 与段落集合 $\mathcal{D}_k$，
+首先进行语义检索，得到与查询 $q$ 最相关的语义单元与段落集合：
+
+\begin{equation}
+\mathcal{U}_q = \text{TopK}(\text{Sim}(q, \mathcal{U}))
+\end{equation}
+
+\begin{equation}
+\mathcal{D}_q = \text{TopK}(\text{Sim}(q, \mathcal{D}_k))
+\end{equation}
+
+其中，$\text{Sim}(\cdot)$ 表示基于向量表示的相似度函数（如余弦相似度），$\text{TopK}(\cdot)$ 
+表示选择相似度最高的前 $K$ 个结果。
+
+\subsection{联合语义表示构建}
+
+在获得相关语义单元集合 $\mathcal{U}_q$ 与段落集合 $\mathcal{D}_q$ 后，将其进行统一组织，构建联合语义上下文：
+
+\begin{equation}
+\mathcal{C}_q = \mathcal{U}_q \oplus \mathcal{D}_q
+\end{equation}
+
+其中，$\oplus$ 表示语义融合操作，即将实体、短语与段落按照一定结构进行拼接与组织。
+
+具体地，联合语义上下文由以下三部分组成：
+
+\begin{itemize}
+\item \textbf{实体信息（Entities）}：提供核心语义节点；
+\item \textbf{短语信息（Phrases）}：补充细粒度语义表达；
+\item \textbf{段落信息（Paragraphs）}：提供完整语义上下文。
+\end{itemize}
+
+该结构能够在保持语义完整性的同时，提升信息表达的丰富性。
+
+为进一步提升上下文质量，本章采用结构化组织策略，将不同语义单元按照语义层级进行排列。具体组织形式如下：
+
+\begin{equation}
+\mathcal{C}_q = \text{Concat}(\mathcal{U}_q^{(E)}, \mathcal{U}_q^{(P)}, \mathcal{D}_q)
+\end{equation}
+
+其中：
+\begin{itemize}
+\item $\mathcal{U}_q^{(E)}$ 表示实体集合；
+\item $\mathcal{U}_q^{(P)}$ 表示短语集合；
+\item $\mathcal{D}_q$ 表示段落集合。
+\end{itemize}
+
+该“实体—短语—段落”的层级结构，有助于引导大语言模型先理解核心语义，再逐步扩展至细粒度语义与完整上下文，从而提升推理能力。
+如\figref{fig:js_prompt}所示，联合语义上下文通过多粒度信息组织，为大语言模型提供了高密度且结构清晰的输入，从而提升推理能力与答案准确性。
+
+\begin{figure}[htbp]
+  \centering
+  \begin{minipage}{0.95\linewidth}
+      \vspace{2mm}
+      \begin{tcolorbox}[title=联合语义上下文提示模板]
+          \small
+  
+          作为一名高级阅读理解助手，你的任务是仔细分析文本段落和相应的问题。
+          你的回答应从“思考：”之后开始，在此部分，你需要系统地阐述你的推理过程，说明你是如何得出结论的。
+          最后，以“答案：”结尾，给出简洁明了、明确的回答，无需赘述。
+  
+  \vspace{5pt}
+  
+  \texttt{上下文}
+  
+  \vspace{3pt}
+  
+  实体: \{Retrieved Entities\}
+  
+  \vspace{3pt}
+  
+  短语: \{Retrieved Phrases\}
+  
+  \vspace{3pt}
+  
+  文本段落: \{Retrieved Paragraphs\}
+  
+  \vspace{5pt}
+
+  问题: \{Question\}
+  
+  \vspace{5pt}
+  
+  思考：
+  
+      \end{tcolorbox}
+      \vspace{2mm}
+  \end{minipage}
+  \caption{联合语义上下文提示模板}
+  \label{fig:js_prompt_template}
+\end{figure}
+
+相比传统方法，本章提出的联合语义上下文构建方法具有以下优势：
+
+\begin{itemize}
+\item \textbf{多粒度语义融合}：同时利用实体、短语与段落三种语义单元，显著提升语义表达的覆盖范围与精细程度；
+
+\item \textbf{推理能力增强}：通过层级化组织不同粒度的语义信息，使核心语义单元优先呈现，有助于大语言模型进行逐步推理与语义聚合；
+
+\item \textbf{Token效率提升}：相较于纯文本上下文，实体与短语具有更紧凑的表达形式，能够在相同或近似的Token预算下提供更高的信息密度，从而提升模型推理效率。
+\end{itemize}
+
+与第三章的 TTRAG 方法相比，本章方法不依赖显式构建的推理路径，而是通过语义信息的联合建模，引导模型在隐式语义空间中完成推理。
+这种方式在保持计算效率的同时，提供了更灵活的上下文表达形式。联合语义上下文构建方法实现了从“单一语义表示”向“多粒度语义融合”的转变，
+为提升检索增强生成在复杂问答任务中的性能提供了关键支持。
+
+\section{实验结果及分析}[Experimental Results and Analysis]
+
+\subsection{数据集}
+
+本章在三个典型的多跳问答基准数据集上对所提出方法进行评估，
+包括 MuSiQue、2WikiMultiHopQA 和 HotpotQA。实验设置遵循 HippoRAG2 的配置，
+从每个数据集的验证集中随机采样 1000 条查询进行评估，所有查询均涉及多跳推理任务。
+
+\subsection{实验设置及评价指标}
+
+在实现方面，本文采用 spaCy 作为实体与短语抽取工具，编码模型选用 \texttt{all-mpnet-base-v2}，用于生成语义向量表示。最终回答由大语言模型 GPT-4o-mini 生成。
+
+在超参数设置方面，检索文档数量设为 top-$k=5$。
+
+本章采用以下两个指标对方法进行评估：
+
+\begin{itemize}
+\item Contain-Acc.（包含匹配准确率）
+\item GPT-Acc.（基于大语言模型的评估准确率）
+\end{itemize}
+
+\myparagraph{Contain-Acc}
+
+Contain-Acc. 用于衡量生成答案是否包含标准答案，是一种宽松匹配指标。对于给定问题，若预测答案 $A_{pred}$ 中包含任一标准答案 $A_{true}$，则视为预测正确。其定义如下：
+
+\begin{equation}
+\text{Contain-Acc.} = \mathbb{I}(A_{true} \subseteq A_{pred})
+\end{equation}
+
+其中，$\mathbb{I}(\cdot)$ 为指示函数，当条件成立时取值为 1，否则为 0。最终结果为所有样本上的平均值。
+
+\myparagraph{GPT-Acc}
+
+GPT-Acc. 是一种基于大语言模型的评估指标，用于衡量预测答案与标准答案在语义层面的匹配程度。具体而言，采用 GPT-4o-mini 作为评估器，对预测答案 $A_{pred}$ 与标准答案 $A_{true}$ 进行比较，并输出判断结果：
+
+\begin{equation}
+\text{GPT-Acc.} = \frac{1}{N} \sum_{i=1}^{N} \text{LLM-Eval}(A_{pred}^{(i)}, A_{true}^{(i)})
+\end{equation}
+
+其中，$\text{LLM-Eval}(\cdot)$ 表示由大语言模型返回的二值判断结果（匹配为 1，不匹配为 0），$N$ 为测试样本数量。
+
+相比于 Contain-Acc.，GPT-Acc. 能够更好地评估语义一致性，尤其适用于表达方式不完全一致但语义等价的情况。
+
+\subsection{基线模型}
+
+本章将所提出的 JS-LinearRAG 方法与多种具有代表性的 RAG 方法进行对比，这些方法覆盖了从传统密集检索到图结构增强检索的不同技术路线。
+
+\begin{itemize}
+
+\item \textbf{Dense Retrieval (Naive RAG)}
+基于向量相似度的经典检索增强生成方法。
+该方法直接将查询与文档编码为向量，通过相似度检索相关文本，并将其拼接作为上下文输入大语言模型进行回答，不涉及结构化建模。
+
+\item \textbf{LightRAG}
+一种轻量级图结构 RAG 。
+
+\item \textbf{HippoRAG}
+受人类记忆机制启发的检索框架，将非结构化文本转化为知识图谱，并通过个性化 PageRank 算法进行多跳检索。
+
+\item \textbf{GFM-RAG}
+一种基于图结构优化的 RAG 方法，通过引入图神经网络与结构约束，对检索过程进行建模与优化，从而提升多跳推理的准确性与泛化能力。
+
+\item \textbf{HippoRAG2}
+在 HippoRAG 原有图结构基础上引入段落节点及“包含关系”边，同时融合语义相似度与结构信息进行联合检索。
+
+\end{itemize}
 
 \section{本章小结}[Brief summary]
 
-\lipsum[1]
