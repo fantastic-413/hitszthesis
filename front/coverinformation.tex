@@ -64,24 +64,82 @@
   estudenttype={Master of Engineering},
   %
   % 关键词用“英文逗号”分割
-  ckeywords={\TeX, \LaTeX, CJK, 论文模板, 毕业论文},
-  ekeywords={\TeX, \LaTeX, CJK, hitszthesis, thesis},
+  ckeywords={检索增强生成, 知识库问答, 知识图谱, 知识推理, 大语言模型},
+  ekeywords={Retrieval-Augmented Generation, Knowledge Base Question Answering, Knowledge Graph, Knowledge Reasoning, Large Language Models},
 }
 
 % 中文摘要
 \begin{cabstract}
 
-  摘要是论文内容的高度概括，应具有独立性和自含性，即不阅读论文的全文，就能获得必要的信息。摘要应包括本论文的目的、主要研究内容、研究方法、创造性成果及其理论与实际意义。摘要中不宜使用公式、化学结构式、图表和非公知公用的符号与术语，不标注引用文献编号，同时避免将摘要写成目录式的内容介绍。
+  随着大语言模型（Large Language Models, LLMs）的快速发展，其在自然语言处理任务中展现出强大的能力。
+  然而，由于模型参数知识的静态性以及对复杂推理任务的局限性，
+  LLMs 在知识密集型多跳问答任务中仍面临知识过时、推理能力不足以及易产生幻觉等问题。
+  检索增强生成（Retrieval-Augmented Generation, RAG）通过引入外部知识缓解了上述问题，
+  但现有的RAG方法在复杂场景下仍存在上下文噪声较大、语义表达不足以及推理能力有限等挑战。
 
-  关键词是为了文献标引工作、用以表示全文主要内容信息的单词或术语。关键词不超过5个，每个关键词中间用分号分隔。（模板作者注：关键词分隔符不用考虑，模板会自动处理。英文关键词同理。）
+  针对上述问题，本文围绕“结构化推理”与“语义建模”两个方向展开研究，提出了两种改进方法。
+  首先，针对文本上下文信噪比较低的问题，提出了一种基于三元组骨架引导文本的检索增强生成方法。
+  该方法通过从文本中抽取知识图谱三元组，构建推理骨架作为结构化推理路径，并基于骨架精确索引相关文本，
+  实现“结构引导 + 文本补充”的上下文构建方式。
+  在三个典型多跳问答数据集 MuSiQue、2WikiMultiHopQA 和 HotpotQA 上的实验结果表明，
+  所提出的方法在各项指标上均优于对比方法。
+  其中，在 2WikiMultiHopQA 数据集上，EM 和 F1 分别达到 55.20\% 和 65.09\%，
+  相较次优方法分别提升 2.80\% 和 3.76\%。
+  在所有数据集上的平均性能达到 55.20\%，取得最优整体表现。
+  同时，在保证性能的前提下，所提出的方法将平均输入 Token 长度减少约 70\%--80\%，
+  显著提升了推理效率与结果可解释性。
+
+  进一步地，针对图结构方法依赖关系抽取且构建成本较高的问题，
+  本文提出了一种基于联合语义建模的检索增强生成方法。
+  该方法在 LinearRAG 框架基础上，引入多粒度语义抽取机制，结合实体与短语信息，
+  并提出基于句子加权的段落表示方法，
+  构建联合语义上下文，实现对多粒度语义信息的统一建模。
+  在 MuSiQue、2WikiMultiHopQA 和 HotpotQA 数据集上的实验结果表明，
+  所提出的方法在各项评价指标上均优于基准方法。
+  在三数据集平均指标上，所提出的方法的包含匹配准确率（Contain-Acc.）和
+  基于大语言模型的评估准确率（GPT-Acc.）分别达到 58.57\% 和 57.93\%，
+  整体平均性能达到 58.25\%。
+  在无需显式推理路径的情况下，该方法实现了更高的信息密度与推理效率。
 
 \end{cabstract}
 
 % 英文摘要
 \begin{eabstract}
 
-  Externally pressurized gas bearing has been widely used in the field of aviation, semiconductor, weave, and measurement apparatus because of its advantage of high accuracy, little friction, low heat distortion, long life-span, and no pollution. In this thesis, based on the domestic and overseas researching\dots\dots
+  With the rapid development of Large Language Models (LLMs), 
+  they have demonstrated strong capabilities across a wide range of natural language processing tasks. 
+  However, due to the static nature of their parametric knowledge and their limitations in handling complex reasoning tasks, 
+  LLMs still face challenges in knowledge-intensive multi-hop question answering, 
+  including outdated knowledge, insufficient reasoning ability, and susceptibility to hallucinations. 
+  Retrieval-Augmented Generation (RAG) alleviates these issues by incorporating external knowledge. 
+  Nevertheless, existing RAG methods still suffer from high context noise, insufficient semantic representation, and limited reasoning capability in complex scenarios.
 
-  Keywords are terms used in a dissertation for indexing, reflecting core information of the dissertation. An abstract may contain a maximum of 5 keywords, with semicolons used in between to separate one another.
+  To address these challenges, this thesis investigates two directions, 
+  namely structured reasoning and semantic modeling, and proposes two improved methods. 
+  First, to mitigate the low signal-to-noise ratio in textual contexts, 
+  a triple-guided text Retrieval-Augmented Generation method is proposed. 
+  This method extracts knowledge graph triples from text and constructs a reasoning skeleton as a structured reasoning path, 
+  which is then used to precisely index relevant textual evidence. 
+  In this way, a "structure-guided + text-enriched" context construction paradigm is achieved. 
+  Experimental results on three representative multi-hop question answering benchmarks, 
+  namely MuSiQue, 2WikiMultiHopQA, and HotpotQA, 
+  demonstrate that the proposed method consistently outperforms baseline approaches across all evaluation metrics. 
+  In particular, on the 2WikiMultiHopQA dataset, it achieves an EM of 55.20\% and an F1 of 65.09\%, 
+  outperforming the second-best method by 2.80\% and 3.76\%, respectively. 
+  The overall average performance across all datasets reaches 55.20\%, achieving the best overall results. 
+  Meanwhile, the proposed method reduces the average input token length by approximately 70\%--80\% without sacrificing performance, 
+  thereby significantly improving reasoning efficiency and interpretability.
+
+  Furthermore, to address the high dependency on relation extraction and the construction cost of graph-based methods, 
+  this thesis proposes a joint semantic modeling-based Retrieval-Augmented Generation method. 
+  Built upon the LinearRAG framework, the method introduces multi-granularity semantic extraction by incorporating both entities and phrases, 
+  and further proposes a sentence-weighted paragraph representation to better capture intra-paragraph semantic distribution. 
+  A joint semantic context is then constructed to unify multi-granularity semantic information. 
+  Experimental results on MuSiQue, 2WikiMultiHopQA, and HotpotQA show that the proposed method consistently outperforms baseline approaches across all evaluation metrics.
+  On the averaged results over the three datasets, the proposed method achieves 
+  a Containment Matching Accuracy (Contain-Acc.) of 58.57\% and 
+  a Large Language Model-based Evaluation Accuracy (GPT-Acc.) of 57.93\%, 
+  with an overall average performance of 58.25\%. Without relying on explicit reasoning paths, 
+  the method achieves higher information density and improved reasoning efficiency.
 
 \end{eabstract}
