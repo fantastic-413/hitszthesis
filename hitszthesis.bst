@@ -86,7 +86,7 @@ FUNCTION {cap.no.address.en} 	{"［S.l.］"}
 FUNCTION {cap.no.address.zh} 	{"［出版地不详］"}
 FUNCTION {cap.no.publisher.en} 	{"［s.n.］"}
 FUNCTION {cap.no.publisher.zh} 	{"［出版者不详］"}
-FUNCTION {cap.et.al.en} 		{"，et~al"}
+FUNCTION {cap.et.al.en} 		{", et~al"}
 FUNCTION {cap.et.al.zh} 		{"，等"}
 FUNCTION {cap.translate.en} 	{"~trans"}
 FUNCTION {cap.translate.zh} 	{"译"}
@@ -98,8 +98,8 @@ FUNCTION {cap.th.en} 			{"th"}
 
 FUNCTION {cap.space}      {" "}
 FUNCTION {cap.period} 		{"\@. "}
-FUNCTION {cap.comma} 			{"\@，"}
-FUNCTION {cap.colon} 			{"\thinspace{}\textnormal{：}"}
+FUNCTION {cap.comma} 			{"\@, "}
+FUNCTION {cap.colon} 			{"\thinspace{}\textnormal{: }"}
 FUNCTION {cap.double.slash} 	{" //\thinspace{}"}
 FUNCTION {cap.dash} 			{"\textnormal{-}"}
 
@@ -697,7 +697,7 @@ FUNCTION {format.booktitle} {                     % String Emtry::format_booktit
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                                                   %
 FUNCTION {format.mark} {                          % String Emtry::format_mark(String mark) {
-  "\,［" swap$ * "］" *                               %   mark = " ［" + mark + "］";
+  "\,[" swap$ * "]" *                               %   mark = " ［" + mark + "］";
   "mark" format.bibinfo                           %   return format_bibinfo(mark, "mark");
 }                                                 % }
                                                   %
@@ -1036,9 +1036,9 @@ FUNCTION {output.address} {                       % void Entry::output_address(i
     address format.address write$                 %     write(format_address(this.address));
   } {                                             %   } else {
     required {                                    %     if (required == 1) {
-      "Require address: " cite$ * warning$        %       warning("Require address: " + this.cite);
-      cap.period write$                           %       write(cap_period);
-      cap.no.address format.address write$        %       write(format_address(cap_no_address()));
+      % "Require address: " cite$ * warning$        %       warning("Require address: " + this.cite);
+      % cap.period write$                           %       write(cap_period);
+      % cap.no.address format.address write$        %       write(format_address(cap_no_address()));
     } 'skip$ if$                                  %     }
   } if$                                           %   }
 }                                                 % }
@@ -1052,9 +1052,9 @@ FUNCTION {output.inproaddress} {                  % void Entry::output_inproaddr
     address format.address write$                 %     write(format_address(this.address));
   } {                                             %   } else {
     required {                                    %     if (required == 1) {
-      "Require address: " cite$ * warning$        %       warning("Require address: " + this.cite);
-      cap.comma write$                            %       write(cap_comma);
-      cap.no.address format.address write$        %       write(format_address(cap_no_address()));
+      % "Require address: " cite$ * warning$        %       warning("Require address: " + this.cite);
+      % cap.comma write$                            %       write(cap_comma);
+      % cap.no.address format.address write$        %       write(format_address(cap_no_address()));
     } 'skip$ if$                                  %     }
   } if$                                           %   }
 }                                                 % }
