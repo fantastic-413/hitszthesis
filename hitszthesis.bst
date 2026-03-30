@@ -332,7 +332,7 @@ FUNCTION {add.brace} {                            % String Entry::add_brace(Stri
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                                                   %
 FUNCTION {add.bracket} {                          % String Entry::bracket(String str) {
-  "（" swap$ * "）\!\!" *                               %   return "（" + str + "）\!\!";
+  "(" swap$ * ") \!\!" *                               %   return "（" + str + "）\!\!";
 }                                                 % }
                                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
