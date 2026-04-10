@@ -11,7 +11,7 @@
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.5\textwidth]{TTRAG_intro.png}
+  \includegraphics[width=0.6\textwidth]{TTRAG_intro.png}
   \caption{LLM在复杂推理任务中的典型工作流程}
   \label{fig：TTRAG_intro}
 \end{figure}
@@ -471,22 +471,22 @@ F1 分数用于衡量预测答案与真实答案之间的词级重叠程度，�
 \item \textbf{None（Direct Generation, GPT-4o-mini）}  
 以基础大语言模型作为对照，不引入任何检索或外部知识，直接根据输入问题生成答案。
 
-\item \textbf{GraphRAG}
+\item \textbf{GraphRAG}\cite{graphrag}
 一种基于知识图谱的RAG框架，通过抽取实体与关系构建全局知识图谱，并结合查询导向摘要（Query-Focused Summarization, QFS）进行信息整合。该方法利用Leiden算法进行社区划分，对子图进行层次化总结，并在推理阶段通过映射与归约（mapping–reduction）机制生成最终答案。
 
 \item \textbf{RAPTOR}\cite{raptor}  
 一种基于递归抽象的层次化检索方法，将长文本组织为树结构。该方法通过SBERT向量表示与高斯混合模型（Gaussian Mixture Model, GMM）对文本进行聚类，并在不同层级生成摘要。在检索阶段，自顶向下遍历相关节点，从而整合多层次上下文信息以支持复杂推理。
 
-\item \textbf{LightRAG}
+\item \textbf{LightRAG}\cite{lightrag}
 一种轻量级图结构RAG方法，结合图索引与双层检索机制。该方法利用大语言模型抽取实体与关系构建动态知识图谱，并通过底层实体查询与高层关系聚合实现高效检索，在保证推理能力的同时减少冗余信息。
 
-\item \textbf{HippoRAG}
+\item \textbf{HippoRAG}\cite{hipporag}
 一种受海马体记忆机制启发的检索框架，将大语言模型与知识图谱及个性化PageRank（Personalized PageRank）相结合。该方法通过OpenIE构建开放领域知识图谱，并引入同义词边进行扩展，利用基于实体的PageRank算法实现多跳推理。
 
-\item \textbf{HippoRAG2}
+\item \textbf{HippoRAG2}\cite{hipporag2}
 HippoRAG的改进版本，引入段落节点与“contains”关系以增强图结构表达能力，同时融合语义相似度与结构信息。在检索阶段，通过实体与短语联合初始化PageRank，并结合大语言模型进行三元组过滤，从而提升事实推理与关系推理能力。
 
-\item \textbf{KET-RAG} 
+\item \textbf{KET-RAG}\cite{ketrag}
 一种低成本、多粒度图索引方法。该方法首先构建文本块的KNN图，并抽取实体关系三元组形成轻量级图骨架。在检索阶段，将上下文预算划分为图结构局部搜索与关键词检索两部分，从而在较低索引成本下实现高效检索。
 
 \end{itemize}
