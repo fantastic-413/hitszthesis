@@ -141,8 +141,8 @@ f(\text{LLMs} \mid q, \mathcal{C}_q) \rightarrow \mathcal{A}_q
 \begin{figure}[htbp]
   \centering
   \begin{minipage}{0.9\textwidth}
-  \begin{tcolorbox}[title=知识图谱构建提示模板]
-  \small
+  \begin{tcolorbox}[title=知识图谱构建提示模板, fonttitle=\small, fontupper=\small]
+  % \small
   给定标题与文本，从文本中抽取所有知识三元组，形式为 
   \textless 标题；关系；尾实体\textgreater，其中标题为给定标题，尾实体为文本中的短语，关系表示标题与尾实体之间的语义关系。
 
@@ -244,8 +244,8 @@ s_i^{(j)} = \mathbf{e}_{q^{(j)}}^\top \mathbf{e}_{t_i}
 \begin{figure}[htbp]
   \centering
   \begin{minipage}{0.9\textwidth}
-  \begin{tcolorbox}[title=推理骨架构建提示模板]
-  \small
+  \begin{tcolorbox}[title=推理骨架构建提示模板, fonttitle=\small, fontupper=\small]
+  % \small
   从候选知识三元组中选择一个最合适的三元组，用于扩展当前推理路径，使其能够逐步回答给定问题。如果当前路径已经足够回答问题，则输出 STOP。请仅输出选择结果。
   
   \vspace{5pt}
