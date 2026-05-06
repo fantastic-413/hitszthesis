@@ -521,6 +521,63 @@ TTRAG 通过构建显式的三元组推理骨架来引导文本检索与上下�
 从方法本质上看，TTRAG 属于“显式结构化推理”范式，而 JS-LinearRAG 则通过多粒度语义融合实现“隐式语义推理”。
 实验结果表明，在保证推理能力的同时，后者在效率与鲁棒性方面具有更优表现。
 
+\begin{table}[htbp]
+  \centering
+  \caption{JS-LinearRAG 与 TTRAG 在 top-$k=10$ 检索设置下的性能对比}
+  \label{table:top10_comparison}
+  \vspace{0.5em}\centering\wuhao
+
+  \resizebox{\textwidth}{!}{
+    \begin{tabular}{@{}lcccccccccccc@{}}
+    \toprule[1.5pt]
+    \multirow{2}{*}{Method} 
+    & \multicolumn{3}{c}{MuSiQue} 
+    & \multicolumn{3}{c}{2WikiMultiHopQA} 
+    & \multicolumn{3}{c}{HotpotQA} 
+    & \multicolumn{3}{c}{Average} \\
+    \cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10} \cmidrule(lr){11-13}
+    & C-Acc. & G-Acc. & Avg 
+    & C-Acc. & G-Acc. & Avg 
+    & C-Acc. & G-Acc. & Avg 
+    & C-Acc. & G-Acc. & Avg \\
+    \midrule[1pt]
+
+    TTRAG$_{\text{sk+docs}}$
+    & 31.50 & \textbf{44.00} & \textbf{37.75} 
+    & 69.30 & 61.00 & 65.15 & \textbf{73.30} 
+    & \textbf{72.30} & \textbf{72.80} & \textbf{58.03} 
+    & \textbf{59.10} & \textbf{58.57} \\
+    TTRAG$_{\text{sk+sens}}$ 
+    & 30.20 & 42.90 & 36.55 
+    & 67.50 & 59.80 & 63.65 
+    & 73.60 & 72.40 & 73.00 
+    & 57.10 & 58.37 & 57.73 \\
+    \textbf{JS-LinearRAG} 
+    & \textbf{34.20} & 38.20 & 36.20 
+    & \textbf{70.00} & \textbf{64.10} & \textbf{67.05} 
+    & 68.20 & 69.80 & 69.00 
+    & 57.47 & 57.37 & 57.42 \\
+
+    \bottomrule[1.5pt]
+    \end{tabular}
+  }
+\end{table}
+
+为进一步消除检索文档数量差异对实验结论的影响，本文补充了 top-$k=10$ 检索设置下的性能对比实验，
+结果如表~\ref{table:top10_comparison} 所示。在较大的检索规模下，TTRAG$_{\text{sk+docs}}$ 的整体平均性能达到 58.57，
+TTRAG$_{\text{sk+sens}}$ 达到 57.73，而 JS-LinearRAG 为 57.42。
+该结果表明，当候选文档数量增加时，TTRAG 通过显式三元组骨架对文本证据进行组织和筛选，能够更充分地利用额外文档中的潜在推理信息，
+从而在整体性能上取得更优表现。
+
+与此同时，JS-LinearRAG 在 top-$k=5$ 设置下已经取得了 58.25 的整体平均性能，接近甚至超过部分 top-$k=10$ 设置下的方法。
+这说明隐式语义推理范式虽然不显式构建推理路径，但通过实体、短语与段落的联合语义建模，
+能够在较少检索文档条件下提供高密度上下文信息，具有更高的检索效率与更低的上下文构建成本。
+
+综合来看，显式结构化推理与隐式语义推理具有不同优势：
+TTRAG 更适合需要充分利用较大候选文档集合、并强调推理路径可解释性的复杂多跳场景；
+JS-LinearRAG 则更适合在较低检索规模和较低构建成本下实现稳定性能提升的场景。
+二者并非简单替代关系，而是分别从结构化证据组织和多粒度语义表达两个角度提升检索增强生成性能。
+
 \myparagraph{指标分析}
 从指标角度来看，Contain-Acc. 主要反映答案是否被成功召回，而 GPT-Acc. 更关注语义一致性。
 JS-LinearRAG 在两个指标上均取得较高分数，说明该方法不仅提升了检索召回能力，同时也增强了生成答案的语义准确性。
