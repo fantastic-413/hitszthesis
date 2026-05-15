@@ -25,16 +25,14 @@
 并以三元组形式组织知识。这种结构化表示能够提供清晰的推理框架，使模型能够更快地捕捉核心信息并沿着明确的推理路径进行推断。
 然而，现有的基于知识图谱增强的RAG方法（KG-RAG）仍然面临以下关键挑战：
 
-\begin{itemize}
-\item \textbf{多跳推理路径的脆弱性}： 在自动构建且存在噪声的知识图谱上进行多跳推理具有较大难度。
+（1）多跳推理路径的脆弱性： 在自动构建且存在噪声的知识图谱上进行多跳推理具有较大难度。
 错误关系或缺失连接可能导致推理链条中断，从而影响推理的完整性。
 
-\item \textbf{三元组语义稀疏性}： 尽管知识图谱三元组提供了清晰的结构框架，但其语义信息通常较为简洁，
+（2）三元组语义稀疏性： 尽管知识图谱三元组提供了清晰的结构框架，但其语义信息通常较为简洁，
 缺乏丰富的上下文细节与解释能力。这种语义稀疏性限制了模型生成复杂和全面答案的能力。
 
-\item \textbf{图结构利用不足}： 大多数KG-RAG方法仅将知识图谱作为检索索引，获取离散的三元组集合，
+（3）图结构利用不足： 大多数KG-RAG方法仅将知识图谱作为检索索引，获取离散的三元组集合，
 并将其简单拼接后输入模型，忽略了图中丰富的拓扑结构信息，而这些结构信息对于复杂推理至关重要。
-\end{itemize}
 
 如\figref{fig：TTRAG_intro}所示，针对上述问题，本章提出一种基于三元组骨架引导的文本检索增强生成方法
 ——\textbf{T}riple-Guided \textbf{T}ext \textbf{R}etrieval-\textbf{A}ugmented \textbf{G}eneration（\textbf{TTRAG}）。
@@ -56,21 +54,19 @@ TTRAG 专为复杂的推理任务而设计。它首先构建知识三元组的�
 这种“先构建骨架、再进行语义增强”的策略，不仅为模型提供了清晰且可验证的推理路径，同时弥补了结构化知识语义表达不足的问题，
 实现了结构化知识与非结构化文本的有效融合。TTRAG方法的主要优势如下：
 
-\begin{itemize}
-\item \textbf{高精度上下文融合}： 通过先构建低噪声的三元组推理骨架，再引入与骨架高度相关的文本信息，
+（1）高精度上下文融合： 通过先构建低噪声的三元组推理骨架，再引入与骨架高度相关的文本信息，
 实现结构化知识与非结构化知识的高效融合，从而显著降低无关信息干扰。
 
-\item \textbf{可解释且可靠的推理过程}： 基于显式的三元组推理链，模型能够生成透明且可验证的推理路径，
+（2）可解释且可靠的推理过程： 基于显式的三元组推理链，模型能够生成透明且可验证的推理路径，
 有效提升生成结果的可信度并减少幻觉现象。
 
-\item \textbf{优越的实验性能}： 在多个多跳问答数据集上的实验结果表明，TTRAG在准确率和F1指标上均优于现有方法，
+（3）优越的实验性能： 在多个多跳问答数据集上的实验结果表明，TTRAG在准确率和F1指标上均优于现有方法，
 且具有良好的泛化能力。
 
-\item \textbf{上下文信息密度提升}: 在三个多跳问答数据集上的实验表明，相较于基线方法，TTRAG可减少约70\%--80\%的提示词长度，
+（4）上下文信息密度提升: 在三个多跳问答数据集上的实验表明，相较于基线方法，TTRAG可减少约70\%--80\%的提示词长度，
 显著降低了上下文中的噪声干扰并提升其知识密度。
-\end{itemize}
 
-本章组织结构如下：3.2节介绍文档检索与知识图谱构建。3.3节介绍三元组推理骨架的构建方法。
+（待修改）本章组织结构如下：3.2节介绍文档检索与知识图谱构建。3.3节介绍三元组推理骨架的构建方法。
 3.4节介绍基于三元组骨架的上下文证据索引。3.5节介绍实验结果与分析。3.6节为本章小结。
 
 \section{文档检索与知识图谱构建}[Document Retrieval and Knowledge Graph Construction]
@@ -79,7 +75,7 @@ TTRAG 专为复杂的推理任务而设计。它首先构建知识三元组的�
 之后通过上下文学习提示大语言模型作为知识图谱生成器 $g$，对每个文档进行OpenIE，从这些文档中抽取实体关系三元组，
 从而构建文档级知识图谱。最后聚合这 $k$ 个文档，形成与查询相关的完整知识图谱 $\mathcal{G}_D$。
 
-\subsection{预备知识}[Preliminary]
+% \subsection{预备知识}[Preliminary]
 
 \myparagraph{知识图谱表示}
 知识图谱可形式化表示为一个有向图 $\mathcal{G} = (\mathcal{E}, \mathcal{R}, \mathcal{T})$。
@@ -93,10 +89,10 @@ $\mathcal{T} \subseteq \mathcal{E} \times \mathcal{R} \times \mathcal{E}$ 表示
 在知识图谱 $\mathcal{G}$ 中，证据链是由多个相互连接的三元组组成的有序序列，
 用于表示一条完整的推理路径。长度为 $l$ 的证据链 $C$，从起始实体 $e_0$ 到终止实体 $e_l$，可表示为：
 \begin{equation}
-C(e_0, e_l) = \langle (e_0, r_1, e_1), (e_1, r_2, e_2), \dots, (e_{l-1}, r_l, e_l) \rangle
+C(e_0, e_l) = \langle (e_0, r_1, e_1), (e_1, r_2, e_2), \dots, (e_{l-1}, r_l, e_l), \rangle
 \end{equation}
 
-其中，$e_i \in \mathcal{E}$（$i = 0, 1, \dots, l$），$r_j \in \mathcal{R}$（$j = 1, 2, \dots, l$）。
+\noindent 其中，$e_i \in \mathcal{E}$（$i = 0, 1, \dots, l$），$r_j \in \mathcal{R}$（$j = 1, 2, \dots, l$）。
 在该序列中，相邻两个三元组 $(e_{i-1}, r_i, e_i)$ 与 $(e_i, r_{i+1}, e_{i+1})$ 通过共享实体 $e_i$ 相连接，
 从而形成连续的推理路径。该结构能够自然地刻画从 $e_0$ 到 $e_l$ 的多跳推理过程，其中每一个三元组均作为支撑整体推理的证据。
 \end{definition}
@@ -105,34 +101,36 @@ C(e_0, e_l) = \langle (e_0, r_1, e_1), (e_1, r_2, e_2), \dots, (e_{l-1}, r_l, e_
 给定自然语言问题 $q$ 以及知识图谱 $\mathcal{G}$，三元组骨架构建的核心任务是从 $\mathcal{G}$ 中检索与问题相关的证据链集合
  $\mathcal{C}_q = \{C_1, C_2, \dots, C_k\}$。在此基础上，定义生成函数：
 \begin{equation}
-f(\text{LLMs} \mid q, \mathcal{C}_q) \rightarrow \mathcal{A}_q
+f(\text{LLMs} \mid q, \mathcal{C}_q) \rightarrow \mathcal{A}_q,
 \end{equation}
 
-其中，$\mathcal{A}_q$ 表示大语言模型针对问题 $q$ 生成的答案。通过利用结构化的证据链 $\mathcal{C}_q$，
+\noindent 其中，$\mathcal{A}_q$ 表示大语言模型针对问题 $q$ 生成的答案。通过利用结构化的证据链 $\mathcal{C}_q$，
 模型能够在显式推理路径的引导下完成答案生成，从而提升生成结果的可解释性与可靠性。
 
-\subsection{文档检索与知识图谱构建}[Document Retrieval and Knowledge Graph Construction]
+% \subsection{文档检索与知识图谱构建}[Document Retrieval and Knowledge Graph Construction]
 
 给定用户查询 $q$ 和文档集合 $\mathcal{D}$，TTRAG 首先使用检索器 $\mathcal{R}$ 从文档集合 $\mathcal{D}$ 中
 检索出与查询最相关的前 $k$ 个文档，记为：
 \begin{equation}
-\mathcal{D}_k = \mathcal{R}(q, \mathcal{D}, k)
+\mathcal{D}_k = \mathcal{R}(q, \mathcal{D}, k),
 \end{equation}
 
-其中，$\mathcal{D}_k = \{d_1, d_2, \dots, d_k\}$ 表示按相关性排序的前 $k$ 个文档集合。
+\noindent 其中，$\mathcal{D}_k = \{d_1, d_2, \dots, d_k\}$ 表示按相关性排序的前 $k$ 个文档集合。
 
 检索器 $\mathcal{R}$ 可以是基于向量相似度的稠密检索模型，也可以是针对检索增强生成任务优化的检索模型。
 具体而言，首先将查询 $q$ 与文档集合 $\mathcal{D}$ 编码为高维向量表示：
 \begin{equation}
-\mathbf{q} = \text{Enc}(q), \quad \mathbf{d}_i = \text{Enc}(d_i)
+\mathbf{q} = \text{Enc}(q), \quad \mathbf{d}_i = \text{Enc}(d_i),
 \end{equation}
 
+\noindent 其中，$\mathbf{q}$ 表示查询 $q$ 的向量表示，$\mathbf{d}_i$ 表示第 $i$ 个文档 $d_i$ 的向量表示，$\text{Enc}(\cdot)$ 表示编码器函数，用于将文本映射至高维语义向量空间。
 随后，通过计算查询向量与文档向量之间的相似度（如余弦相似度）：
 \begin{equation}
-\text{sim}(q, d_i) = \frac{\mathbf{q} \cdot \mathbf{d}_i}{\|\mathbf{q}\| \cdot \|\mathbf{d}_i\|}
+\text{sim}(q, d_i) = \frac{\mathbf{q} \cdot \mathbf{d}_i}{\|\mathbf{q}\| \cdot \|\mathbf{d}_i\|},
 \end{equation}
 
-并选取得分最高的前 $k$ 个文档构成文档集合 $\mathcal{D}_k$，作为后续知识图谱构建的文本基础。
+\noindent 其中，$\text{sim}(q, d_i)$ 表示查询 $q$ 与文档 $d_i$ 之间的相似度得分，$\mathbf{q} \cdot \mathbf{d}_i$ 表示向量内积，$\|\mathbf{q}\|$ 和 $\|\mathbf{d}_i\|$ 分别表示对应向量的 $\ell_2$ 范数。
+选取得分最高的前 $k$ 个文档构成文档集合 $\mathcal{D}_k$，作为后续知识图谱构建的文本基础。
 
 在获得相关文档集合 $\mathcal{D}_k$ 后，再利用大语言模型执行OpenIE。
 具体而言，采用基于上下文学习的提示方式，将大语言模型作为知识图谱生成器 $g$，从每个文档中抽取实体关系三元组。
@@ -163,22 +161,23 @@ f(\text{LLMs} \mid q, \mathcal{C}_q) \rightarrow \mathcal{A}_q
 
 对于每个文档 $d_i \in \mathcal{D}_k$，生成对应的三元组集合：
 \begin{equation}
-\mathcal{T}_i = g(d_i)
+\mathcal{T}_i = g(d_i),
 \end{equation}
 
-其中，$\mathcal{T}_i = \{(h, r, t)\}$ 表示从文档 $d_i$ 中抽取的实体关系三元组集合。
+\noindent 其中，$\mathcal{T}_i = \{(h, r, t)\}$ 表示从文档 $d_i$ 中抽取的实体关系三元组集合。
 
 通过对所有文档的三元组集合进行聚合，得到完整的三元组集合：
 \begin{equation}
-\mathcal{T}_D = \bigcup_{i=1}^{k} \mathcal{T}_i
+\mathcal{T}_D = \bigcup_{i=1}^{k} \mathcal{T}_i,
 \end{equation}
 
+\noindent 其中，$\mathcal{T}_D$ 表示整个文档集合对应的全局三元组集合，$\mathcal{T}_i$ 表示第 $i$ 个文档抽取得到的三元组集合，$k$ 表示检索得到的文档总数。
 进一步地，可构建对应的知识图谱：
 \begin{equation}
-\mathcal{G}_D = (\mathcal{E}_D, \mathcal{R}_D, \mathcal{T}_D)
+\mathcal{G}_D = (\mathcal{E}_D, \mathcal{R}_D, \mathcal{T}_D),
 \end{equation}
 
-其中，$\mathcal{E}_D$ 和 $\mathcal{R}_D$ 分别表示由三元组集合 $\mathcal{T}_D$ 推导得到的实体集合与关系集合。
+\noindent 其中，$\mathcal{G}_D$ 表示基于文档集合构建的知识图谱，$\mathcal{E}_D$ 表示知识图谱中的实体集合，$\mathcal{R}_D$ 表示知识图谱中的关系集合，$\mathcal{T}_D$ 表示知识图谱中的三元组集合。$\mathcal{E}_D$ 和 $\mathcal{R}_D$ 分别由三元组集合 $\mathcal{T}_D$ 中涉及的实体节点与关系类型推导得到。
 
 在构建知识图谱的过程中，本章进一步为每个三元组建立其与原始文本的映射关系。具体而言，对于每个三元组 $(h, r, t)$，
 记录其对应的原始文档、段落以及句子级别的位置索引，从而实现三元组与文本之间的可追溯关联。
@@ -191,7 +190,7 @@ f(\text{LLMs} \mid q, \mathcal{C}_q) \rightarrow \mathcal{A}_q
   \label{fig：TTRAG_framework}
 \end{figure}
 
-\section{三元组骨架构建方法}[Reasoning Skeleton Construction]
+\section{短语三元组推理结构构建}[Reasoning Skeleton Construction]
 
 如\figref{fig：TTRAG_framework}所示，在构建文档级知识图谱 $\mathcal{G}_D = (\mathcal{E}_D, \mathcal{R}_D, 
 \mathcal{T}_D)$ 的基础上，本章进一步提出一种基于三元组路径的推理骨架构建方法，用于支持多跳推理过程。
@@ -204,8 +203,10 @@ TTRAG通过迭代式路径扩展、基于大语言模型的三元组选择以及
 给定问题 $q$ 及其对应的三元组集合 $\mathcal{T}_D = \{t_1, t_2, \dots, t_n\}$，其中每个三元组表示为 $t=(h,r,o)$，
 本章首先将所有三元组编码为稠密向量表示：
 \begin{equation}
-\mathbf{E}_T = \{ \mathbf{e}_{t_1}, \dots, \mathbf{e}_{t_n} \}
+\mathbf{E}_T = \{ \mathbf{e}_{t_1}, \dots, \mathbf{e}_{t_n} \},
 \end{equation}
+
+\noindent 其中，$\mathbf{E}_T$ 表示三元组集合的向量表示集合，$\mathbf{e}_{t_i}$ 表示三元组 $t_i$ 的稠密语义向量表示。
 
 该编码过程通过预训练语义编码模型实现，并在整个推理过程中复用，从而避免重复计算，提高整体效率。
 
@@ -213,26 +214,31 @@ TTRAG通过迭代式路径扩展、基于大语言模型的三元组选择以及
 
 推理骨架通过逐步扩展路径的方式构建。在第 $j$ 跳（hop）时，当前部分路径可表示为：
 \begin{equation}
-\mathcal{P}^{(j)} = \{ t_{p_1}, \dots, t_{p_j} \}
+\mathcal{P}^{(j)} = \{ t_{p_1}, \dots, t_{p_j} \},
 \end{equation}
+
+\noindent 其中，$\mathcal{P}^{(j)}$ 表示当前第 $j$ 跳时的部分推理路径，$t_{p_k}$ 表示路径中第 $k$ 个被选中的三元组。
 
 为了结合已有推理信息与原始问题，本章将当前路径与问题进行拼接，构造新的查询：
 \begin{equation}
-q^{(j)} = \text{Concat}(\mathcal{P}^{(j)}, q)
+q^{(j)} = \text{Concat}(\mathcal{P}^{(j)}, q),
 \end{equation}
 
-并将其编码为查询向量 $\mathbf{e}_{q^{(j)}}$。随后，通过计算查询向量与候选三元组向量之间的相似度（采用内积形式）：
+\noindent 其中，$q^{(j)}$ 表示第 $j$ 跳时的扩展查询，$\text{Concat}(\cdot)$ 表示路径信息与原始问题的拼接操作。
+
+将构造的新的查询编码为查询向量 $\mathbf{e}_{q^{(j)}}$。随后，通过计算查询向量与候选三元组向量之间的相似度（采用内积形式）得到每个候选三元组的相关性得分：
 \begin{equation}
-s_i^{(j)} = \mathbf{e}_{q^{(j)}}^\top \mathbf{e}_{t_i}
+s_i^{(j)} = \mathbf{e}_{q^{(j)}}^\top \mathbf{e}_{t_i},
 \end{equation}
 
-得到每个候选三元组的相关性得分。
+\noindent 其中，$s_i^{(j)}$ 表示第 $j$ 跳时候选三元组 $t_i$ 的相关性得分，$\mathbf{e}_{q^{(j)}}$ 表示扩展查询 $q^{(j)}$ 的向量表示，$\mathbf{e}_{t_i}$ 表示候选三元组 $t_i$ 的向量表示。
 
 为避免路径中出现重复三元组，本章对当前路径中已选取的三元组进行掩码处理。随后选取得分最高的前 $m$ 个三元组构成候选集合：
 \begin{equation}
-\mathcal{C}^{(j)} = \text{Top-}m(\{s_i^{(j)}\})
+\mathcal{C}^{(j)} = \text{Top-}m(\{s_i^{(j)}\}),
 \end{equation}
 
+\noindent 其中，$\mathcal{C}^{(j)}$ 表示第 $j$ 跳的候选三元组集合，$\text{Top-}m(\cdot)$ 表示按照相关性得分排序后选取前 $m$ 个候选项的操作，$m$ 表示每轮保留的候选三元组数量。
 该过程实现了基于语义匹配的候选路径扩展。
 
 \subsection{基于大语言模型的三元组选择}[LLM-guided Triple Selection]
@@ -273,9 +279,10 @@ s_i^{(j)} = \mathbf{e}_{q^{(j)}}^\top \mathbf{e}_{t_i}
 
 模型输出每个候选三元组的选择概率，以及一个特殊的终止选项 $\text{STOP}$：
 \begin{equation}
-P(c \mid \mathcal{P}^{(j)}, q), \quad c \in \mathcal{C}^{(j)} \cup \{\text{STOP}\}
+P(c \mid \mathcal{P}^{(j)}, q), \quad c \in \mathcal{C}^{(j)} \cup \{\text{STOP}\},
 \end{equation}
 
+\noindent 其中，$P(c \mid \mathcal{P}^{(j)}, q)$ 表示在当前推理路径 $\mathcal{P}^{(j)}$ 和问题 $q$ 条件下选择候选项 $c$ 的条件概率，$\mathcal{C}^{(j)}$ 表示第 $j$ 跳的候选三元组集合，$c$ 可以是候选集合中的某一三元组，也可以是特殊终止选项 $\text{STOP}$，$\text{STOP}$ 表示当前推理路径无需继续扩展。
 当模型选择 $\text{STOP}$ 时，表示当前推理路径已经完成。
 
 该机制结合了语义相似度与语言模型的推理能力，使路径扩展更加符合自然语言语义逻辑。
@@ -286,27 +293,30 @@ P(c \mid \mathcal{P}^{(j)}, q), \quad c \in \mathcal{C}^{(j)} \cup \{\text{STOP}
 
 对于每一条未完成路径，从候选集合中选取概率最高的前 $M$ 个扩展分支，并计算路径的累积得分：
 \begin{equation}
-\text{Score}(\mathcal{P}^{(j+1)}) = \text{Score}(\mathcal{P}^{(j)}) \cdot P(c \mid \mathcal{P}^{(j)}, q)
+\text{Score}(\mathcal{P}^{(j+1)}) = \text{Score}(\mathcal{P}^{(j)}) \cdot P(c \mid \mathcal{P}^{(j)}, q),
 \end{equation}
 
-同时，为抑制低质量路径的扩展，本章引入阈值 $\delta$，过滤掉概率低于该阈值的候选分支，从而减少噪声传播。
+\noindent 其中，$\text{Score}(\mathcal{P}^{(j)})$ 表示当前第 $j$ 跳路径的累积得分，
+$\text{Score}(\mathcal{P}^{(j+1)})$ 表示扩展后路径的累积得分，
+$P(c \mid \mathcal{P}^{(j)}, q)$ 表示在当前路径与问题条件下选择候选扩展项 $c$ 的概率。
 
+同时，为抑制低质量路径的扩展，本章引入阈值 $\delta$，过滤掉概率低于该阈值的候选分支，从而减少噪声传播。
 所有扩展路径按照累积得分进行排序，并保留前 $B$ 条路径进入下一轮扩展。
 
 \subsection{路径终止与骨架生成}[Termination and Skeleton Generation]
 
 当满足以下任一条件时，路径被标记为完成：
-\begin{itemize}
-\item 模型选择 $\text{STOP}$；
-\item 达到预设定的超参数最大跳数 $L$。
-\end{itemize}
+
+（1）模型选择 $\text{STOP}$；
+
+（2）达到预设定的超参数最大跳数 $L$。
 
 最终得到的推理骨架集合表示为：
 \begin{equation}
-\mathcal{S} = \{ (\mathcal{P}_1, s_1), \dots, (\mathcal{P}_B, s_B) \}
+\mathcal{S} = \{ (\mathcal{P}_1, s_1), \dots, (\mathcal{P}_B, s_B) \},
 \end{equation}
 
-其中，$\mathcal{P}_i$ 表示一条推理路径，$s_i$ 表示其对应的置信得分。
+\noindent 其中，$\mathcal{P}_i$ 表示一条推理路径，$s_i$ 表示其对应的置信得分。
 
 上述推理骨架为后续答案生成提供了结构化、可解释的推理依据，同时显著提升了推理过程的可靠性与可控性。
 
@@ -320,16 +330,18 @@ P(c \mid \mathcal{P}^{(j)}, q), \quad c \in \mathcal{C}^{(j)} \cup \{\text{STOP}
 在推理骨架 $\mathcal{S}$ 构建完成后，本章进一步引入文本证据以增强语义表达能力。
 对于骨架中的每一个三元组 $\tau = (h, r, t)$，定义其对应的文本映射函数为：
 \begin{equation}
-\mathcal{M}(\tau) = \{ d_\tau, p_\tau, s_\tau \}
+\mathcal{M}(\tau) = \{ d_\tau, p_\tau, s_\tau \},
 \end{equation}
 
-其中，$d_\tau$ 表示三元组来源文档，$p_\tau$ 表示对应段落，$s_\tau$ 表示包含该三元组语义信息的文本信息。
+\noindent 其中，$\mathcal{M}(\tau)$ 表示三元组 $\tau$ 的文本映射结果，$d_\tau$ 表示三元组来源文档，$p_\tau$ 表示三元组所在段落，$s_\tau$ 表示与该三元组语义对应的文本信息，$h$、$r$、$t$ 分别表示头实体、关系和尾实体。
 
 基于该映射关系，可以从原始文档中精确定位与三元组相关的文本证据。
 进一步地，对于一条推理路径 $\mathcal{P} = \{ \tau_1, \tau_2, \dots, \tau_l \}$，其对应的文本证据集合定义为：
 \begin{equation}
-\mathcal{E}(\mathcal{P}) = \bigcup_{i=1}^{l} \mathcal{M}(\tau_i)
+\mathcal{E}(\mathcal{P}) = \bigcup_{i=1}^{l} \mathcal{M}(\tau_i),
 \end{equation}
+
+\noindent 其中，$\mathcal{E}(\mathcal{P})$ 表示推理路径 $\mathcal{P}$ 对应的文本证据集合，$\tau_i$ 表示路径中的第 $i$ 个三元组，$l$ 表示路径长度，$\bigcup$ 表示对路径中所有三元组对应文本映射结果的聚合操作。
 
 \figref{句子过滤图.png} 展示了检索到的原始文本块中过滤出仅包含知识的句子的方式。
 通过仅保留包含核心知识的句子，本章方法在保证语义完整性的同时，能够显著减少无关文本信息干扰，提高知识密度，
@@ -347,10 +359,10 @@ P(c \mid \mathcal{P}^{(j)}, q), \quad c \in \mathcal{C}^{(j)} \cup \{\text{STOP}
 在完成推理骨架构建与上下文证据索引后，TTRAG 将结构化知识与文本证据进行融合，
 并与用户问题共同构建提示（Prompt），输入至大语言模型以生成最终答案。该过程可形式化表示为：
 \begin{equation}
-\mathcal{A}_q = f_{\text{LLM}}(q, \mathcal{S}, \mathcal{C})
+\mathcal{A}_q = f_{\text{LLM}}(q, \mathcal{S}, \mathcal{C}),
 \end{equation}
 
-其中，$f_{\text{LLM}}(\cdot)$ 表示作为答案生成器的大语言模型，
+\noindent 其中，$f_{\text{LLM}}(\cdot)$ 表示作为答案生成器的大语言模型，
 $\mathcal{A}_q$ 表示模型输出的最终答案，$q$ 表示用户查询，
 $\mathcal{S}$ 表示推理骨架集合，$\mathcal{C}$ 表示基于推理骨架索引得到的上下文证据文本。
 
@@ -361,8 +373,10 @@ $\mathcal{S}$ 表示推理骨架集合，$\mathcal{C}$ 表示基于推理骨架�
 在获得推理骨架及其对应的文本证据后，本章首先对证据链进行结构化编排。具体而言，按照推理路径中三元组的顺序，
 对其对应的文本片段进行组织与拼接，从而构建逻辑连贯的上下文表示：
 \begin{equation}
-\mathcal{C} = \text{Concat}(s_{\tau_1}, s_{\tau_2}, \dots, s_{\tau_l})
+\mathcal{C} = \text{Concat}(s_{\tau_1}, s_{\tau_2}, \dots, s_{\tau_l}),
 \end{equation}
+
+\noindent 其中，$\mathcal{C}$ 表示最终构建的结构化上下文，$\text{Concat}(\cdot)$ 表示按推理顺序进行文本拼接的操作，$s_{\tau_i}$ 表示第 $i$ 个三元组 $\tau_i$ 对应的文本证据片段，$l$ 表示推理路径中包含的三元组总数。
 
 与传统基于检索文档的RAG方法直接拼接完整检索文档不同，该过程将离散的结构化知识与非结构化文本信息进行融合，从而有效过滤冗余信息，
 使推理过程以自然语言形式呈现。该策略能够显著提升上下文的知识密度，降低无关信息的干扰，
@@ -371,25 +385,16 @@ $\mathcal{S}$ 表示推理骨架集合，$\mathcal{C}$ 表示基于推理骨架�
 \subsection{最终答案生成}[Final Answer Generation]
 
 在构建完成提示后，输入大语言模型进行最终的答案生成。该过程包含以下两个阶段：
-\begin{itemize}
-\item 首先，大语言模型对当前证据进行充分性判断，即评估推理骨架与文本证据是否能够完整回答用户问题。当证据充足时，
+
+（1）首先，大语言模型对当前证据进行充分性判断，即评估推理骨架与文本证据是否能够完整回答用户问题。当证据充足时，
 模型基于结构化推理路径生成一个全面且符合逻辑的答案。
-\item 当模型判断当前证据不足以支持完整推理时，可以触发进一步的推理与探索过程（如扩展推理路径或补充证据）。
+
+（2）当模型判断当前证据不足以支持完整推理时，可以触发进一步的推理与探索过程（如扩展推理路径或补充证据）。
 在多轮推理仍未获得明确结论的情况下，模型将综合已有证据与其内在知识，生成最合理的答案。
-\end{itemize}
 
 上述机制实现了基于结构化证据的动态问答过程，有效提升了答案生成的准确性、连贯性与鲁棒性。
 
 \section{实验结果与分析}[Experimental Results and Analysis]
-
-为全面评估TTRAG方法的有效性，本章围绕以下研究问题展开实验分析：
-
-\begin{itemize}
-    \item \textbf{性能分析（Performance Analysis）}：TTRAG方法在多跳问答任务中相较于现有RAG方法的性能表现如何？
-    \item \textbf{消融实验（Ablation Study）}：TTRAG方法中的各个关键模块对整体性能的贡献如何？
-    \item \textbf{可解释性（Interpretability）}：TTRAG方法在提升推理过程透明性和可解释性方面的表现如何？
-    \item \textbf{性能细分（Performance Breakdown）}：TTRAG方法在不同类型的多跳推理任务上的表现如何？
-\end{itemize}
 
 \subsection{数据集}[Datasets]
 
@@ -398,30 +403,26 @@ $\mathcal{S}$ 表示推理骨架集合，$\mathcal{C}$ 表示基于推理骨架�
 实验设置遵循 HippoRAG2\cite{hipporag2} 的配置，从每个数据集的验证集中随机采样 1000 条查询进行评估，
 所有查询均涉及多跳推理任务。
 
-\begin{itemize}[leftmargin=1em]
-
-\item \textbf{2WikiMultiHopQA}  
+2WikiMultiHopQA：
 2WikiMultiHopQA 是一个专门为多跳问答任务构建的数据集，旨在全面评估模型的多步推理能力。
 该数据集结合了结构化知识库 Wikidata 与非结构化文本 Wikipedia，通过自动构建生成高质量、自然流畅的问答对。
 数据集共包含约 192,606 个问答样本，其中训练集约 167,454 条，测试集约 25,152 条。
 问题类型覆盖比较型（Comparative）、推理型（Inferential）、组合型（Compositional）以及桥接型（Bridge-comparison）等
 多种多跳推理形式。
 
-\item \textbf{HotpotQA}  
+HotpotQA：
 HotpotQA 是一个大规模多跳问答数据集，旨在推动多跳推理与可解释问答系统的发展。
 该数据集包含约 112,779 条基于 Wikipedia 构建的问答对。其主要特点包括：
 一是问题通常需要跨多个文档进行信息检索与推理，从而有效评估模型的多跳推理能力；
 二是问题类型丰富，采用自然语言构建，不依赖于特定知识图谱结构；
 三是提供句子级支持事实标注，为评估模型的可解释性提供了重要依据。
 
-\item \textbf{MuSiQue}  
+MuSiQue：
 MuSiQue 数据集旨在解决现有多跳问答数据集中存在的“推理捷径”问题。
 该数据集采用自底向上的构建策略，通过组合多个单跳问题生成 2 至 4 跳的复杂问题。
 MuSiQue-Ans 版本包含约 248,814 条问答样本，其核心特点在于强调“连贯推理”（coherent reasoning），
 即模型必须依赖前一步推理结果才能完成后续推理。
 该设计显著提高了任务难度，并有效抑制了模型通过单跳推理或捷径策略获得答案的可能性。
-
-\end{itemize}
 
 \subsection{实验设置与评价指标}[Experimental Setup and Evaluation Metrics]
 
@@ -439,25 +440,31 @@ MuSiQue-Ans 版本包含约 248,814 条问答样本，其核心特点在于强�
 对于每个问题，EM 指标为二值指标。当模型预测答案与任一真实答案完全一致时，记为正确，否则为错误。
 设预测答案为 $A_{\text{pred}}$，真实答案集合为 $\mathcal{A}_{\text{true}}$，则单个样本的 EM 计算如下：
 \begin{equation}
-\text{EM} = \mathbb{I}(A_{\text{pred}} \in \mathcal{A}_{\text{true}})
+\text{EM} = \mathbb{I}(A_{\text{pred}} \in \mathcal{A}_{\text{true}}),
 \end{equation}
 
-其中，$\mathbb{I}(\cdot)$ 为指示函数，当条件成立时取值为 $1$，否则为 $0$。最终 EM 分数为所有样本的平均值。
+\noindent 其中，$\text{EM}$ 表示精确匹配分数，$\mathbb{I}(\cdot)$ 为指示函数，当条件成立时取值为 $1$，否则为 $0$。最终 EM 分数为所有样本的平均值。
 
 \myparagraph{F1}
 F1 分数用于衡量预测答案与真实答案之间的词级重叠程度，将答案视为词集合进行计算。相较于 EM 指标，F1 更为宽松。
 设预测答案为 $A_{\text{pred}}$，真实答案为 $A_{\text{true}}$，则精确率（Precision）与召回率（Recall）定义为：
 \begin{equation}
-\text{Precision} = \frac{|\text{words}(A_{\text{pred}}) \cap \text{words}(A_{\text{true}})|}{|\text{words}(A_{\text{pred}})|}
+\text{Precision} = \frac{|\text{words}(A_{\text{pred}}) \cap \text{words}(A_{\text{true}})|}{|\text{words}(A_{\text{pred}})|},
 \end{equation}
+
+\noindent 其中，$\text{Precision}$ 表示预测答案中正确词项所占比例，$\text{words}(\cdot)$ 表示将答案拆分为词集合的操作。
 \begin{equation}
-\text{Recall} = \frac{|\text{words}(A_{\text{pred}}) \cap \text{words}(A_{\text{true}})|}{|\text{words}(A_{\text{true}})|}
+\text{Recall} = \frac{|\text{words}(A_{\text{pred}}) \cap \text{words}(A_{\text{true}})|}{|\text{words}(A_{\text{true}})|},
 \end{equation}
+
+\noindent 其中，$\text{Recall}$ 表示真实答案中被成功预测出的词项比例。
 
 基于上述定义，F1 分数计算为：
 \begin{equation}
-\text{F1} = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}
+\text{F1} = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}},
 \end{equation}
+
+\noindent 其中，$\text{F1}$ 表示精确率与召回率的调和平均值，用于综合衡量答案预测质量。
 
 当一个问题对应多个真实答案时，取预测答案与所有真实答案计算得到的 F1 分数中的最大值作为该问题的最终得分。
 整体 F1 分数为所有问题得分的平均值。
@@ -746,31 +753,32 @@ TTRAG$_{\text{tris+alldocs}}$ 取得了最优整体性能。
 
 \myparagraph{不同推理类型性能分析（Performance Breakdown）}
 为进一步分析本章方法在不同推理类型下的性能表现，本章在 2WikiMultiHopQA 数据集上进行了 win--loss 分析。
-\figref{fig:correct_appendix} 展示了不同推理类型下的正确率分布，\figref{fig:error_appendix} 则给出了对应的错误率分布。
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.8 \linewidth]{analysis_correct_rate_type.pdf}
-  \caption{TTRAG 与 HippoRAG2 在各多跳推理类别上的正确率对比。}
-  \label{fig:correct_appendix}
-\end{figure}
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.8 \linewidth]{analysis_wrong_rate_type.pdf}
-  \caption{TTRAG 与 HippoRAG2 在各多跳推理类别上的错误率对比。}
-  \label{fig:error_appendix}
-\end{figure}
-
 如\figref{fig:winlose} 所示，相较于 HippoRAG2，本章方法在各类推理任务上均取得了整体性能提升。
 其中，在 Comparison 与 Compositional 问题上，性能提升最为显著。
-与此同时，性能下降的样本数量较少，表明本章方法在提升整体性能的同时，并未引入明显的不稳定性或退化现象。
+% 与此同时，性能下降的样本数量较少，
+能够在各类推理类型上实现较为均衡且稳定的性能增强，并非仅针对某一特定推理模式进行优化而牺牲其他类型任务表现，体现出更全面的多跳推理能力与良好的泛化性。
 上述结果从更细粒度角度揭示了模型在不同推理类型下的行为特征。
+
+% \figref{fig:correct_appendix} 展示了不同推理类型下的正确率分布，\figref{fig:error_appendix} 则给出了对应的错误率分布。
+
+% \begin{figure}[htbp]
+%   \centering
+%   \includegraphics[width=0.8 \linewidth]{analysis_correct_rate_type.pdf}
+%   \caption{TTRAG 与 HippoRAG2 在各多跳推理类别上的正确率对比。}
+%   \label{fig:correct_appendix}
+% \end{figure}
+
+% \begin{figure}[htbp]
+%   \centering
+%   \includegraphics[width=0.8 \linewidth]{analysis_wrong_rate_type.pdf}
+%   \caption{TTRAG 与 HippoRAG2 在各多跳推理类别上的错误率对比。}
+%   \label{fig:error_appendix}
+% \end{figure}
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.8 \linewidth]{analysis_win_lose_type.pdf}
-  \caption{TTRAg 与 HippoRAG2 在 2WikiMultiHopQA 数据集不同推理类型上的胜负对比分析。正值表示TTRAG回答正确而基线模型回答错误的样本，负值则表示相反的情况。}
+  \caption{TTRAG 与 HippoRAG2 在 2WikiMultiHopQA 数据集不同推理类型上的胜负对比分析。正值表示TTRAG回答正确而基线模型回答错误的样本，负值则表示相反的情况。}
   \label{fig:winlose}
 \end{figure}
 

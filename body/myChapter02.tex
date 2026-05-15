@@ -190,18 +190,19 @@ DPR 是这一方向的代表性工作，其表明仅依赖稠密向量检索便�
 
 在相似度计算方面，向量检索通常采用内积（inner product）或余弦相似度（cosine similarity）作为度量标准。
 设查询向量为 $\mathbf{q} \in \mathbb{R}^d$，候选文本向量为 $\mathbf{d} \in \mathbb{R}^d$，则内积相似度定义为：
-
 \begin{equation}
-\text{sim}_{\text{dot}}(\mathbf{q}, \mathbf{d}) = \mathbf{q}^\top \mathbf{d} = \sum_{i=1}^{d} q_i d_i
+\text{sim}_{\text{dot}}(\mathbf{q}, \mathbf{d}) = \mathbf{q}^\top \mathbf{d} = \sum_{i=1}^{d} q_i d_i,
 \end{equation}
+
+\noindent 其中，$\text{sim}_{\text{dot}}(\mathbf{q}, \mathbf{d})$ 表示查询向量与候选向量之间的内积相似度，$\mathbf{q}^\top \mathbf{d}$ 表示向量点积运算，$q_i$ 和 $d_i$ 分别表示查询向量与候选向量在第 $i$ 维上的取值，$d$ 表示向量空间的维度。
 
 余弦相似度则在内积基础上对向量进行归一化处理，其定义为：
-
 \begin{equation}
-\text{sim}_{\cos}(\mathbf{q}, \mathbf{d}) = \frac{\mathbf{q}^\top \mathbf{d}}{\|\mathbf{q}\| \, \|\mathbf{d}\|}
+\text{sim}_{\cos}(\mathbf{q}, \mathbf{d}) = \frac{\mathbf{q}^\top \mathbf{d}}{\|\mathbf{q}\| \, \|\mathbf{d}\|},
 \end{equation}
 
-其中，$\|\mathbf{q}\|$ 和 $\|\mathbf{d}\|$ 分别表示向量的 $\ell_2$ 范数。
+\noindent 其中，$\text{sim}_{\cos}(\mathbf{q}, \mathbf{d})$ 表示查询向量与候选向量之间的余弦相似度，$\|\mathbf{q}\|$ 和 $\|\mathbf{d}\|$ 分别表示向量 $\mathbf{q}$ 与 $\mathbf{d}$ 的 $\ell_2$ 范数。
+
 在实际应用中，当向量经过归一化处理后，内积相似度与余弦相似度在排序效果上通常等价，因此常使用内积来实现更高效的计算。
 
 由于大规模语料库中的候选文本数量通常非常庞大，若直接对所有向量逐一比对，将带来较高的时间开销。
@@ -229,15 +230,20 @@ FAISS\cite{faiss} 是这一方向中应用最广泛的工具之一，它支持�
 \begin{equation}
 X = \{x_1, x_2, \dots, x_n\},
 \end{equation}
+
+\noindent 其中，$X$ 表示长度为 $n$ 的输入文本序列，$x_i$ 表示序列中的第 $i$ 个词或子词单元，$n$ 表示输入序列的总长度。
 预测与之对应的标签序列
 \begin{equation}
 Y = \{y_1, y_2, \dots, y_n\},
 \end{equation}
-其中 $y_i$ 表示第 $i$ 个词或子词对应的实体标签。实际系统中通常采用 BIO 或 BIOES 等标注方案，
+
+\noindent 其中， $Y$ 表示与输入序列对应的标签序列，$y_i$ 表示第 $i$ 个词或子词对应的实体标签。实际系统中通常采用 BIO 或 BIOES 等标注方案，
 将实体边界识别与实体类别判断统一为序列标注问题。其目标可以形式化表示为
 \begin{equation}
-Y^{*} = \arg\max_{Y} P(Y \mid X).
+Y^{*} = \arg\max_{Y} P(Y \mid X),
 \end{equation}
+
+\noindent 其中，$Y^{*}$ 表示在给定输入序列 $X$ 条件下的最优标签序列，$P(Y \mid X)$ 表示标签序列 $Y$ 在输入序列 $X$ 条件下的条件概率，$\arg\max$ 表示选择使条件概率最大的标签序列。
 
 如\figref{fig: NER框架}所示，展示了命名实体识别任务的基本流程。
 早期命名实体识别方法主要依赖人工设计特征和统计学习模型，如条件随机场（Conditional Random Field, CRF）等。
@@ -256,15 +262,20 @@ Lample 等人提出的 BiLSTM-CRF 架构表明，在无需复杂人工特征的�
 在此基础上，预训练语言模型进一步推动了 NER 技术的发展。
 BERT 通过双向 Transformer 预训练获得上下文相关表示，使得 NER 能够充分利用更丰富的上下文语义信息。
 基于 BERT 的命名实体识别通常将输入文本编码为上下文向量，再在输出层进行逐位置分类，或结合 CRF 层建模标签之间的依赖关系。
+
 设 BERT 编码器输出的上下文表示为
 \begin{equation}
 \mathbf{H} = \{\mathbf{h}_1, \mathbf{h}_2, \dots, \mathbf{h}_n\},
 \end{equation}
+
+\noindent 其中，$\mathbf{H}$ 表示输入序列经过 BERT 编码后的上下文表示集合，$\mathbf{h}_i$ 表示第 $i$ 个词或子词对应的上下文向量表示，$n$ 表示输入序列长度。
 则每个位置的标签概率可表示为
 \begin{equation}
 P(y_i \mid X) = \text{Softmax}(W \mathbf{h}_i + b),
 \end{equation}
-其中 $W$ 和 $b$ 为分类层参数。BERT 及其变体在命名实体识别任务中显著提升了性能，尤其适用于上下文依赖较强的复杂实体识别场景。
+
+\noindent 其中，$P(y_i \mid X)$ 表示在输入序列 $X$ 条件下第 $i$ 个位置标签为 $y_i$ 的概率，$\text{Softmax}(\cdot)$ 表示归一化分类函数，$W$ 表示分类层的权重矩阵，$b$ 表示偏置项，$\mathbf{h}_i$ 表示第 $i$ 个位置的上下文表示向量。
+BERT 及其变体在命名实体识别任务中显著提升了性能，尤其适用于上下文依赖较强的复杂实体识别场景。
 
 从本文研究内容来看，命名实体识别的作用主要体现在两个方面：一方面，它是构建图结构或语义索引的起点，
 能够从原始文本中定位关键实体节点；另一方面，在后续多粒度语义建模中，实体通常也是最基本、最稳定的语义单元。
@@ -279,10 +290,14 @@ OpenIE 更强调开放域、可扩展和领域无关的抽取能力。给定一�
 \begin{equation}
 \mathcal{T}(s) = \{(h_1, r_1, t_1), (h_2, r_2, t_2), \dots, (h_m, r_m, t_m)\},
 \end{equation}
-其中 $h_i$ 表示头实体或主语成分，$r_i$ 表示关系短语，$t_i$ 表示尾实体或宾语成分。对于整个文档集合 $\mathcal{D} = \{d_1, d_2, \dots, d_k\}$，可进一步得到三元组总集合
+
+\noindent 其中， $\mathcal{T}(s)$ 表示从文本 $s$ 中抽取出的关系三元组集合，$(h_i, r_i, t_i)$ 表示第 $i$ 个抽取出的关系事实，$h_i$ 表示头实体或主语成分，$r_i$ 表示关系短语，$t_i$ 表示尾实体或宾语成分，$m$ 表示文本中抽取得到的关系事实总数。
+对于整个文档集合 $\mathcal{D} = \{d_1, d_2, \dots, d_k\}$，可进一步得到三元组总集合
 \begin{equation}
-\mathcal{T}_{\mathcal{D}} = \bigcup_{i=1}^{k} \mathcal{T}(d_i).
+\mathcal{T}_{\mathcal{D}} = \bigcup_{i=1}^{k} \mathcal{T}(d_i),
 \end{equation}
+
+\noindent 其中，$\mathcal{D}$ 表示包含 $k$ 个文档的文档集合，$d_i$ 表示第 $i$ 个文档，$\mathcal{T}(d_i)$ 表示从文档 $d_i$ 中抽取出的三元组集合，$\mathcal{T}_{\mathcal{D}}$ 表示整个文档集合中的全局关系三元组集合。
 
 如\figref{fig: OpenIE示意图}所示，展示了开放式信息抽取的基本流程。
 OpenIE 的代表性工作可以追溯到 Etzioni\cite{openie} 等人提出的 TextRunner 框架，其核心思想是从海量文本中自动抽取开放域关系，
@@ -312,15 +327,19 @@ OpenIE 的代表性工作可以追溯到 Etzioni\cite{openie} 等人提出的 Te
 命名实体识别更关注“识别文本中的关键实体单元”，而开放式信息抽取则进一步关注“识别实体之间的关系及其事实表达”。
 前者为后者提供候选语义节点，后者则为前者补充结构化关系信息。可以将两者的关系概括为：
 \begin{equation}
-\text{Text} \xrightarrow{\text{NER}} \text{Entities} \xrightarrow{\text{OpenIE}} \text{Triples / Graph}.
+\text{Text} \xrightarrow{\text{NER}} \text{Entities} \xrightarrow{\text{OpenIE}} \text{Triples / Graph},
 \end{equation}
+
+\noindent 其中，$\text{Text}$ 表示原始输入文本，$\text{NER}$ 表示命名实体识别过程，用于从文本中识别关键实体，$\text{Entities}$ 表示抽取出的实体集合，$\text{OpenIE}$ 表示开放式信息抽取过程，用于识别实体之间的关系，$\text{Triples / Graph}$ 表示最终生成的结构化三元组集合或知识图谱。
 
 然而，随着大语言模型的发展，传统的“先实体识别、再关系抽取”的流水线式处理方式逐渐被统一建模方式所替代。
 在基于大语言模型的开放式信息抽取中，模型可以直接从原始文本中同时识别实体及其关系，
 即在无需显式命名实体识别模块的情况下，直接生成结构化三元组：
 \begin{equation}
-\text{Text} \xrightarrow{\text{LLM-based OpenIE}} \text{Triples}.
+\text{Text} \xrightarrow{\text{LLM-based OpenIE}} \text{Triples},
 \end{equation}
+
+\noindent 其中，$\text{LLM-based OpenIE}$ 表示基于大语言模型的开放式信息抽取过程，该过程直接从原始文本中统一完成实体识别与关系抽取任务，$\text{Triples}$ 表示最终输出的结构化关系三元组集合。
 
 该方式利用大语言模型强大的上下文理解能力，将实体识别与关系抽取过程进行隐式融合，
 能够更好地处理复杂句法结构与跨句语义关系，因此在近年来的知识图谱构建与图增强检索方法中得到广泛应用。
@@ -335,7 +354,7 @@ OpenIE 则容易受到抽取噪声和关系表达不稳定的影响。如何根�
 
 \section{本章小结}[Brief summary]
 
-本章围绕检索增强生成相关的关键技术进行了系统梳理。
+本章系统梳理了本文研究所涉及的核心理论基础与关键支撑技术。
 首先，介绍了朴素检索增强生成方法的基本框架及其在知识增强方面的优势与局限；
 其次，分析了基于知识图谱的检索增强生成方法，通过结构化建模提升多跳推理能力，同时指出其在图谱质量与计算开销方面的挑战；
 随后，介绍了文本表示与向量检索技术，为高效语义匹配与大规模检索提供基础支撑；
