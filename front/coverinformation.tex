@@ -24,8 +24,8 @@
   %=========
   % ctitleone={基于结构与语义分析的检索增强大语言模型生成方法研究},%本科生封面使用
   % ctitletwo={关键技术的研究},%本科生封面使用
-  ctitlecover={基于结构化推理与语义建模的大语言模型检索增强生成方法研究},%放在封面中使用，自由断行
-  ctitle={基于结构化推理与语义建模的大语言模型检索增强生成方法研究},%放在原创性声明中使用
+  ctitlecover={基于结构与语义分析的大语言模型检索增强生成方法},%放在封面中使用，自由断行
+  ctitle={基于结构与语义分析的大语言模型检索增强生成方法},%放在原创性声明中使用
   % csubtitle={一条副标题}, %一般情况没有，可以注释掉
   cxueke={工学},
   cpostgraduatetype={学术},
@@ -50,7 +50,7 @@
   %=========
   % 英文信息
   %=========
-  etitle={Research on Retrieval Augmented Generation Methods for Large Language Models Based on Structured Reasoning and Semantic Modeling},
+  etitle={Large Language Model Retrieval-Augmented Generation Methods Based on Structural and Semantic Analysis},
   % esubtitle={This is the sub title},
   exueke={Engineering},
   esubject={Computer technology},
@@ -77,9 +77,9 @@
   检索增强生成（Retrieval-Augmented Generation, RAG）通过引入外部知识缓解了上述问题，
   但现有的RAG方法在复杂场景下仍存在上下文噪声较大、语义表达不足以及推理能力有限等挑战。
 
-  针对上述问题，本文围绕“结构化推理”与“语义建模”两个方向展开研究，提出了两种改进方法。
-  首先，针对文本上下文信噪比较低的问题，提出了一种基于三元组骨架引导文本的检索增强生成方法。
-  该方法通过从文本中抽取知识图谱三元组，构建推理骨架作为结构化推理路径，并基于骨架精确索引相关文本，
+  针对上述问题，本文围绕“结构分析”与“语义分析”两个方向展开研究，提出了两种改进方法。
+  首先，针对文本上下文信噪比较低的问题，提出了一种基于知识三元组结构分析文本的检索增强生成方法。
+  该方法通过从文本中抽取知识三元组图，构建推理路径作为结构化推理路径，并基于推理路径精确索引相关文本，
   实现“结构引导 + 文本补充”的上下文构建方式。
   在三个典型多跳问答数据集 MuSiQue、2WikiMultiHopQA 和 HotpotQA 上的实验结果表明，
   所提出的方法在各项指标上均优于对比方法。
@@ -89,11 +89,12 @@
   同时，在保证性能的前提下，所提出的方法将平均输入 Token 长度减少约 70\%--80\%，
   显著提升了推理效率与结果可解释性。
 
-  进一步地，针对图结构方法依赖关系抽取且构建成本较高的问题，
-  本文提出了一种基于联合语义建模的检索增强生成方法。
-  该方法在 LinearRAG 框架基础上，引入多粒度语义抽取机制，结合实体与短语信息，
+  进一步地，针对图结构方法依赖复杂关系建模且构建成本较高的问题，
+  本文提出了一种基于结构与语义联合建模的检索增强生成方法
+  该方法在 LinearRAG 框架基础上，引入实体、短语与知识三元组的联合语义抽取机制，
   并提出基于句子加权的段落表示方法，
-  构建联合语义上下文，实现对多粒度语义信息的统一建模。
+  构建结构增强的联合语义上下文，
+  实现对结构信息与语义信息的统一建模。
   在 MuSiQue、2WikiMultiHopQA 和 HotpotQA 数据集上的实验结果表明，
   所提出的方法在各项评价指标上均优于基准方法。
   在三数据集平均指标上，所提出的方法的包含匹配准确率（Contain-Acc.）和
@@ -114,13 +115,10 @@
   Retrieval-Augmented Generation (RAG) alleviates these issues by incorporating external knowledge. 
   Nevertheless, existing RAG methods still suffer from high context noise, insufficient semantic representation, and limited reasoning capability in complex scenarios.
 
-  To address these challenges, this thesis investigates two directions, 
-  namely structured reasoning and semantic modeling, and proposes two improved methods. 
-  First, to mitigate the low signal-to-noise ratio in textual contexts, 
-  a triple-guided text Retrieval-Augmented Generation method is proposed. 
-  This method extracts knowledge graph triples from text and constructs a reasoning skeleton as a structured reasoning path, 
-  which is then used to precisely index relevant textual evidence. 
-  In this way, a "structure-guided + text-enriched" context construction paradigm is achieved. 
+  To address these problems, this thesis conducts research from two perspectives: structural analysis and semantic analysis, and proposes two improved methods.
+  First, to address the low signal-to-noise ratio in textual contexts, a retrieval-augmented generation method based on knowledge triple structural analysis is proposed.
+  This method extracts knowledge triple graphs from retrieved documents, constructs structured reasoning paths, and accurately indexes relevant textual evidence based on these reasoning paths,
+  thereby forming a context construction paradigm of “structure-guided + text-enriched”
   Experimental results on three representative multi-hop question answering benchmarks, 
   namely MuSiQue, 2WikiMultiHopQA, and HotpotQA, 
   demonstrate that the proposed method consistently outperforms baseline approaches across all evaluation metrics. 
@@ -130,11 +128,10 @@
   Meanwhile, the proposed method reduces the average input token length by approximately 70\%--80\% without sacrificing performance, 
   thereby significantly improving reasoning efficiency and interpretability.
 
-  Furthermore, to address the high dependency on relation extraction and the construction cost of graph-based methods, 
-  this thesis proposes a joint semantic modeling-based Retrieval-Augmented Generation method. 
-  Built upon the LinearRAG framework, the method introduces multi-granularity semantic extraction by incorporating both entities and phrases, 
-  and further proposes a sentence-weighted paragraph representation to better capture intra-paragraph semantic distribution. 
-  A joint semantic context is then constructed to unify multi-granularity semantic information. 
+  Furthermore, to address the high construction cost and complex relational modeling dependency of graph-based methods, 
+  this thesis proposes a retrieval-augmented generation method based on joint structural and semantic modeling.
+  Built upon the LinearRAG framework, this method introduces a joint semantic extraction mechanism that integrates entities, phrases, and knowledge triples, 
+  proposes a sentence-weighted paragraph representation approach, and constructs a structure-enhanced joint semantic context to achieve unified modeling of structural and semantic information.
   Experimental results on MuSiQue, 2WikiMultiHopQA, and HotpotQA show that the proposed method consistently outperforms baseline approaches across all evaluation metrics.
   On the averaged results over the three datasets, the proposed method achieves 
   a Containment Matching Accuracy (Contain-Acc.) of 58.57\% and 
