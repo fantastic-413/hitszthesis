@@ -46,3 +46,4 @@ dist
 *.eps
 
 !hitszthesis-*.pdf
+main.synctex(busy)

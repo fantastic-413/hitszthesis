@@ -78,7 +78,7 @@
   但现有的RAG方法在复杂场景下仍存在上下文噪声较大、语义表达不足以及推理能力有限等挑战。
 
   针对上述问题，本文围绕“结构分析”与“语义分析”两个方向展开研究，提出了两种改进方法。
-  首先，针对文本上下文信噪比较低的问题，提出了一种基于知识三元组结构分析文本的检索增强生成方法。
+  首先，针对文本上下文信噪比较低的问题，提出了一种基于结构分析的检索增强生成方法。
   该方法通过从文本中抽取知识三元组图，构建推理路径作为结构化推理路径，并基于推理路径精确索引相关文本，
   实现“结构引导 + 文本补充”的上下文构建方式。
   在三个典型多跳问答数据集 MuSiQue、2WikiMultiHopQA 和 HotpotQA 上的实验结果表明，
@@ -116,7 +116,7 @@
   Nevertheless, existing RAG methods still suffer from high context noise, insufficient semantic representation, and limited reasoning capability in complex scenarios.
 
   To address these problems, this thesis conducts research from two perspectives: structural analysis and semantic analysis, and proposes two improved methods.
-  First, to address the low signal-to-noise ratio in textual contexts, a retrieval-augmented generation method based on knowledge triple structural analysis is proposed.
+  First, to address the low signal-to-noise ratio in textual contexts, a retrieval-augmented generation method based on structural analysis is proposed.
   This method extracts knowledge triple graphs from retrieved documents, constructs structured reasoning paths, and accurately indexes relevant textual evidence based on these reasoning paths,
   thereby forming a context construction paradigm of “structure-guided + text-enriched”
   Experimental results on three representative multi-hop question answering benchmarks, 

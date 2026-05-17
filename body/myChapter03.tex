@@ -1,7 +1,7 @@
 % !TEX root = ../main.tex
 
 % 中英标题：\chapter{中文标题}[英文标题]
-\chapter{基于知识三元组结构分析的检索增强生成方法}[Retrieval-Augmented Generation Method Guided by Triplet Skeleton]
+\chapter{基于结构分析的检索增强生成方法}[Retrieval-Augmented Generation Method Guided by Triplet Skeleton]
 
 \section{引言}[Introduction]
 
@@ -34,7 +34,7 @@
 （3）图结构利用不足： 大多数KG-RAG方法仅将知识图谱作为检索索引，获取离散的三元组集合，
 并将其简单拼接后输入模型，忽略了图中丰富的拓扑结构信息，而这些结构信息对于复杂推理至关重要。
 
-如\figref{fig:TTRAG_intro}所示，针对上述问题，本章提出一种基于知识三元组结构分析的文本检索增强生成方法
+如\figref{fig:TTRAG_intro}所示，针对上述问题，本章提出一种基于结构分析的文本检索增强生成方法
 ——\textbf{T}riple-Guided \textbf{T}ext \textbf{R}etrieval-\textbf{A}ugmented \textbf{G}eneration（\textbf{TTRAG}）。
 与传统RAG方法直接检索非结构化文本，或KG-RAG方法使用离散三元组不同，TTRAG提出了一种“两阶段融合”框架。
 该方法首先基于查询构建高质量的知识三元组推理路径，然后在此结构化推理路径基础上引入精确的文本上下文进行补充。
@@ -840,7 +840,7 @@ TTRAG$_{\text{tris+alldocs}}$ 取得了最优整体性能。
 
 \section{本章小结}[Brief summary]
 
-本章针对传统 RAG 方法在多跳推理任务中存在的上下文噪声高、推理路径不清晰以及结构信息利用不足等问题，提出了一种名为“基于知识三元组结构分析的检索增强生成”（TTRAG）的新型框架，旨在解决复杂的推理任务。
+本章针对传统 RAG 方法在多跳推理任务中存在的上下文噪声高、推理路径不清晰以及结构信息利用不足等问题，提出了一种名为“基于结构分析的检索增强生成”（TTRAG）的新型框架，旨在解决复杂的推理任务。
 具体而言，本章首先通过检索器从语料库中获取与问题相关的候选文档，并利用大语言模型执行开放式信息抽取，构建文档级知识三元组图。
 在此基础上，设计了基于向量检索与大语言模型引导的推理路径构建方法，通过多跳路径扩展与束搜索策略生成高质量的知识三元组推理链。
 随后，通过上下文证据索引机制，将推理路径与原始文本进行精确对齐，筛选出高相关的句子或文档级证据，从而在保证语义完整性的同时有效降低上下文噪声。
