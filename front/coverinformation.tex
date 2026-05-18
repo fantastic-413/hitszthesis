@@ -79,7 +79,7 @@
 
   针对上述问题，本文围绕“结构分析”与“语义分析”两个方向展开研究，提出了两种改进方法。
   首先，针对文本上下文信噪比较低的问题，提出了一种基于结构分析的检索增强生成方法。
-  该方法通过从文本中抽取知识三元组图，构建推理路径作为结构化推理路径，并基于推理路径精确索引相关文本，
+  该方法通过从文本中抽取短语结构三元组图，构建推理路径作为结构化推理路径，并基于推理路径精确索引相关文本，
   实现“结构引导 + 文本补充”的上下文构建方式。
   在三个典型多跳问答数据集 MuSiQue、2WikiMultiHopQA 和 HotpotQA 上的实验结果表明，
   所提出的方法在各项指标上均优于对比方法。
@@ -91,7 +91,7 @@
 
   进一步地，针对图结构方法依赖复杂关系建模且构建成本较高的问题，
   本文提出了一种基于结构与语义联合建模的检索增强生成方法
-  该方法在 LinearRAG 框架基础上，引入实体、短语与知识三元组的联合语义抽取机制，
+  该方法在 LinearRAG 框架基础上，引入实体、短语与短语结构三元组的联合语义抽取机制，
   并提出基于句子加权的段落表示方法，
   构建结构增强的联合语义上下文，
   实现对结构信息与语义信息的统一建模。
@@ -117,7 +117,7 @@
 
   To address these problems, this thesis conducts research from two perspectives: structural analysis and semantic analysis, and proposes two improved methods.
   First, to address the low signal-to-noise ratio in textual contexts, a retrieval-augmented generation method based on structural analysis is proposed.
-  This method extracts knowledge triple graphs from retrieved documents, constructs structured reasoning paths, and accurately indexes relevant textual evidence based on these reasoning paths,
+  This method extracts phrase-structured triple graphs from retrieved documents, constructs structured reasoning paths, and accurately indexes relevant textual evidence based on these reasoning paths,
   thereby forming a context construction paradigm of “structure-guided + text-enriched”
   Experimental results on three representative multi-hop question answering benchmarks, 
   namely MuSiQue, 2WikiMultiHopQA, and HotpotQA, 
@@ -130,7 +130,7 @@
 
   Furthermore, to address the high construction cost and complex relational modeling dependency of graph-based methods, 
   this thesis proposes a retrieval-augmented generation method based on joint structural and semantic modeling.
-  Built upon the LinearRAG framework, this method introduces a joint semantic extraction mechanism that integrates entities, phrases, and knowledge triples, 
+  Built upon the LinearRAG framework, this method introduces a joint semantic extraction mechanism that integrates entities, phrases, and phrase-structured triples, 
   proposes a sentence-weighted paragraph representation approach, and constructs a structure-enhanced joint semantic context to achieve unified modeling of structural and semantic information.
   Experimental results on MuSiQue, 2WikiMultiHopQA, and HotpotQA show that the proposed method consistently outperforms baseline approaches across all evaluation metrics.
   On the averaged results over the three datasets, the proposed method achieves 
