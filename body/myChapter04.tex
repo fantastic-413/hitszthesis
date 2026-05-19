@@ -542,7 +542,7 @@ $\text{Concat}(\cdot)$ 表示上下文拼接函数。
 
 \subsection{性能实验结果及分析}
 
-主要实验结果如表~\ref{table:js_main_result} 所示。本文在三个典型多跳问答数据集（MuSiQue、2WikiMultiHopQA 和 HotpotQA）上，
+主要实验结果如表~\ref{table:js_main_result} 和表~\ref{table:js_main_result_llama3} 所示。本文在三个典型多跳问答数据集（MuSiQue、2WikiMultiHopQA 和 HotpotQA）上，
 系统比较了所提出的 JS-LinearRAG 及短语结构三元组结构增强的 JS-LinearRAG$_{\text{pst}}$ 与多种主流 RAG 方法的性能表现。
 其中，“C-Acc.” 表示 Contain-Acc.，“G-Acc.” 表示 GPT-Acc.，“Avg” 表示两项指标的平均值。
 同时，表格最后一列统计了三个数据集上的整体平均性能，以综合评估各方法的总体效果。
@@ -550,10 +550,12 @@ $\text{Concat}(\cdot)$ 表示上下文拼接函数。
 本文补充了第三章 TTRAG 在联合语义增强条件下的变体
 （TTRAG$_{\text{sk+docs+se}}$、TTRAG$_{\text{sk+sens+se}}$），
 从而能够更全面评估短语结构三元组结构信息与联合语义信息在不同方法范式中的作用差异。
+本章分别在开源模型 Llama-3-8B-Instruct 和闭源模型 GPT-4o-mini 上进行评估，
+以下所有表未在表题中说明基座模型时，均为 GPT-4o-mini 的结果。
 
 \begin{table}[htbp]
   \centering
-  \caption{JS-LinearRAG 与多种 RAG 方法在三个多跳问答数据集上的性能对比}
+  \caption{在三个多跳问答数据集上的性能对比，基座模型为 GPT-4o-mini}
   \label{table:js_main_result}
   \vspace{0.5em}\centering\wuhao
 
@@ -565,53 +567,10 @@ $\text{Concat}(\cdot)$ 表示上下文拼接函数。
     & \multicolumn{3}{c}{2WikiMultiHopQA} 
     & \multicolumn{3}{c}{HotpotQA} 
     & \multicolumn{3}{c}{Average} \\
-    \cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10} \cmidrule(lr){11-13}
     & C-Acc. & G-Acc. & Avg 
     & C-Acc. & G-Acc. & Avg 
     & C-Acc. & G-Acc. & Avg 
     & C-Acc. & G-Acc. & Avg \\
-    \midrule[1pt]
-    \multicolumn{13}{c}{\textbf{Llama-3-8B-Instruct}} \\
-    \midrule[1pt]
-
-    TTRAG$_{\text{sk+docs}}$
-    & \underline{22.30} & \underline{28.50} & \underline{25.40}
-    & \textbf{58.50} & \underline{47.40} & \underline{52.95}
-    & \underline{63.90} & \underline{59.80} & 61.85
-    & \underline{48.23} & \underline{45.23} & \underline{46.73} \\
-
-    TTRAG$_{\text{sk+sens}}$
-    & \textbf{23.60} & \textbf{29.90} & \textbf{26.75}
-    & \underline{58.40} & \textbf{49.00} & \textbf{53.70}
-    & 63.80 & \textbf{60.30} & \underline{62.05}
-    & \textbf{48.60} & \textbf{46.40} & \textbf{47.50} \\
-
-    TTRAG$_{\text{sk+docs+se}}$
-    & 21.20 & 27.20 & 24.20
-    & 51.30 & 42.20 & 46.75
-    & \textbf{65.10} & \underline{59.80} & \textbf{62.45}
-    & 45.87 & 43.07 & 44.47 \\
-
-    TTRAG$_{\text{sk+sens+se}}$
-    & 21.50 & 28.00 & 24.75
-    & 54.10 & 44.90 & 49.50
-    & \underline{63.90} & 58.20 & 61.05
-    & 46.50 & 43.70 & 45.10 \\
-
-    JS-LinearRAG
-    & 21.80 & 18.60 & 20.20
-    & 54.70 & 35.00 & 44.85
-    & 59.10 & 50.20 & 54.65
-    & 45.20 & 34.60 & 39.90 \\
-
-    JS-LinearRAG$_{\text{pst}}$
-    & 22.10 & 18.30 & 20.20
-    & 55.10 & 35.40 & 45.25
-    & 59.30 & 51.90 & 55.60
-    & 45.50 & 35.20 & 40.35 \\
-
-    \midrule
-    \multicolumn{13}{c}{\textbf{GPT-4o-mini}} \\
     \midrule[1pt]
 
     DenseRetrieval
@@ -685,6 +644,67 @@ $\text{Concat}(\cdot)$ 表示上下文拼接函数。
     & 67.50 & 60.80 & \underline{64.15}
     & 68.30 & 70.10 & 69.20
     & \underline{57.27} & \underline{57.13} & \underline{57.20} \\
+    
+    \bottomrule[1.5pt]
+    \end{tabular}
+  }
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption{在三个多跳问答数据集上的性能对比，基座模型为 Llama-3-8B-Instruct}
+  \label{table:js_main_result_llama3}
+  \vspace{0.5em}\centering\wuhao
+
+  \resizebox{\textwidth}{!}{
+    \begin{tabular}{@{}lcccccccccccc@{}}
+    \toprule[1.5pt]
+    \multirow{2}{*}{Method} 
+    & \multicolumn{3}{c}{MuSiQue} 
+    & \multicolumn{3}{c}{2WikiMultiHopQA} 
+    & \multicolumn{3}{c}{HotpotQA} 
+    & \multicolumn{3}{c}{Average} \\
+    & C-Acc. & G-Acc. & Avg 
+    & C-Acc. & G-Acc. & Avg 
+    & C-Acc. & G-Acc. & Avg 
+    & C-Acc. & G-Acc. & Avg \\
+    \midrule[1pt]
+
+    TTRAG$_{\text{sk+docs}}$
+    & \underline{22.30} & \underline{28.50} & \underline{25.40}
+    & \textbf{58.50} & \underline{47.40} & \underline{52.95}
+    & \underline{63.90} & \underline{59.80} & 61.85
+    & \underline{48.23} & \underline{45.23} & \underline{46.73} \\
+
+    TTRAG$_{\text{sk+sens}}$
+    & \textbf{23.60} & \textbf{29.90} & \textbf{26.75}
+    & \underline{58.40} & \textbf{49.00} & \textbf{53.70}
+    & 63.80 & \textbf{60.30} & \underline{62.05}
+    & \textbf{48.60} & \textbf{46.40} & \textbf{47.50} \\
+
+    TTRAG$_{\text{sk+docs+se}}$
+    & 21.20 & 27.20 & 24.20
+    & 51.30 & 42.20 & 46.75
+    & \textbf{65.10} & \underline{59.80} & \textbf{62.45}
+    & 45.87 & 43.07 & 44.47 \\
+
+    TTRAG$_{\text{sk+sens+se}}$
+    & 21.50 & 28.00 & 24.75
+    & 54.10 & 44.90 & 49.50
+    & \underline{63.90} & 58.20 & 61.05
+    & 46.50 & 43.70 & 45.10 \\
+
+    JS-LinearRAG
+    & 21.80 & 18.60 & 20.20
+    & 54.70 & 35.00 & 44.85
+    & 59.10 & 50.20 & 54.65
+    & 45.20 & 34.60 & 39.90 \\
+
+    JS-LinearRAG$_{\text{pst}}$
+    & 22.10 & 18.30 & 20.20
+    & 55.10 & 35.40 & 45.25
+    & 59.30 & 51.90 & 55.60
+    & 45.50 & 35.20 & 40.35 \\
     
     \bottomrule[1.5pt]
     \end{tabular}
@@ -906,7 +926,6 @@ TTRAG 能够通过显式短语结构三元组推理路径有效组织和筛选�
     & \multicolumn{3}{c}{2WikiMultiHopQA} 
     & \multicolumn{3}{c}{HotpotQA} 
     & \multicolumn{3}{c}{Average} \\
-    \cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10} \cmidrule(lr){11-13}
     & C-Acc. & G-Acc. & Avg 
     & C-Acc. & G-Acc. & Avg 
     & C-Acc. & G-Acc. & Avg 
@@ -974,7 +993,6 @@ js 表示联合语义上下文（joint semantic context），pst 表示短语结
     & \multicolumn{3}{c}{2WikiMultiHopQA} 
     & \multicolumn{3}{c}{HotpotQA} 
     & \multicolumn{3}{c}{Average} \\
-    \cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10} \cmidrule(lr){11-13}
     & C-Acc. & G-Acc. & Avg 
     & C-Acc. & G-Acc. & Avg 
     & C-Acc. & G-Acc. & Avg 

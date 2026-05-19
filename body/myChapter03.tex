@@ -538,15 +538,16 @@ HippoRAG的改进版本，引入段落节点与“contains”关系以增强图�
 
 \subsection{性能实验结果与分析}[Main Results and Analysis]
 
-主要实验结果如表\ref{table:main_result_hippo} 所示。
+主要实验结果如表\ref{table:main_result_hippo} 和表\ref{table:main_result_hippo_llama} 所示。
 “AVG”表示 EM 与 F1 的平均值，“None”表示仅使用大语言模型直接生成答案（无检索）。
 每列最优结果以粗体标出，次优结果以下划线标出。
 本章分别在开源模型 Llama-3-8B-Instruct 和闭源模型 GPT-4o-mini 上对 TTRAG 方法进行评估，
+以下所有表未在表题中说明基座模型时，均为 GPT-4o-mini 的结果。
 并统计了各方法的性能指标及其 Token 消耗。
 
 \begin{table}[htbp]
   % 按照规范使用双语标题（中英文都已经写好），可选参数里填 label
-  \caption{多跳问答基准数据集上的性能对比。}
+  \caption{多跳问答基准数据集上的性能对比，基座模型为 GPT-4o-mini}
   \label{table:main_result_hippo}
   % 规范要求的间距、居中与五号字体
   \vspace{0.5em}\centering\wuhao
@@ -555,11 +556,9 @@ HippoRAG的改进版本，引入段落节点与“contains”关系以增强图�
     \begin{tabular}{@{}lcccccccccccc@{}}
     \toprule[1.5pt]
     \multirow{2}{*}{Method} & \multicolumn{3}{c}{Musique} & \multicolumn{3}{c}{2WikiMultiHopQA} & \multicolumn{3}{c}{HotpotQA} & \multicolumn{3}{c}{Average} \\
-    \cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10} \cmidrule(lr){11-13}
     & EM & F1 & Avg & EM & F1 & Avg & EM & F1 & Avg & EM & F1 & Avg \\
     
     \midrule[1pt]
-    \multicolumn{13}{c}{\textbf{GPT-4o-mini}} \\  \midrule[1pt]
     None     & 5.40 & 14.41 & 9.91 & 23.20 & 30.55 & 26.88 & 24.30 & 35.30 & 29.80 & 17.63 & 26.75 & 22.19 \\ 
     RAPTOR      & 27.70 & 39.20 & 33.45 & 39.70 & 48.40 & 44.05 & 50.60 & 64.70 & 57.65 & 39.33 & 50.77 & 45.05 \\ 
     GraphRAG  & 27.00 & 39.20 & 33.10 & 45.70 & 61.00 & 53.35 & 51.40 & 67.60 & 59.50 & 41.37 & 55.93 & 48.65 \\ 
@@ -569,8 +568,25 @@ HippoRAG的改进版本，引入段落节点与“contains”关系以增强图�
     KETRAG-P   & 12.40 & 17.05 & 14.73 & 28.50 & 34.95 & 31.73 & 42.60 & 55.88 & 49.24 & 27.83 & 35.96 & 31.90 \\ 
     TTRAG$_\text{sk+docs}$   & 32.50 & \textbf{46.11} & \textbf{39.31} & \textbf{55.20} & \textbf{65.09} & \textbf{60.15} & 58.40 & \underline{73.92} & \underline{66.16} & \underline{48.70} & \textbf{61.71} & \textbf{55.20} \\
     TTRAG$_\text{sk+sens}$   & \underline{32.50} & 45.32 & 38.91 & \underline{54.90} & \underline{64.24} & \underline{59.57} & \underline{59.00} & \textbf{74.36} & \textbf{66.68} & \textbf{48.80} & \underline{61.31} & \underline{55.05} \\
+    \bottomrule[1.5pt]
+    \end{tabular}
+  }
+\end{table}
+
+\begin{table}[htbp]
+  % 按照规范使用双语标题（中英文都已经写好），可选参数里填 label
+  \caption{多跳问答基准数据集上的性能对比，基座模型为 Llama-3-8B-Instruct}
+  \label{table:main_result_hippo_llama}
+  % 规范要求的间距、居中与五号字体
+  \vspace{0.5em}\centering\wuhao
+
+  \resizebox{\textwidth}{!}{
+    \begin{tabular}{@{}lcccccccccccc@{}}
+    \toprule[1.5pt]
+    \multirow{2}{*}{Method} & \multicolumn{3}{c}{Musique} & \multicolumn{3}{c}{2WikiMultiHopQA} & \multicolumn{3}{c}{HotpotQA} & \multicolumn{3}{c}{Average} \\
+    & EM & F1 & Avg & EM & F1 & Avg & EM & F1 & Avg & EM & F1 & Avg \\
+    
     \midrule[1pt]
-    \multicolumn{13}{c}{\textbf{Llama-3-8B-Instruct}} \\ \midrule[1pt]
     HippoRAG & 13.00 & 21.93 & 17.47 & 40.70 & 50.02 & 45.36 & 38.40 & 50.95 & 44.68 & 30.70 & 40.97 & 35.83 \\ 
     HippoRAG2 & \textbf{21.60} & \textbf{31.53} & \textbf{26.57} & 23.60 & 45.61 & 34.61 & 49.00 & 62.84 & 55.92 & 31.40 & 46.66 & 39.03 \\ 
     TTRAG$_\text{sk+docs}$ & \underline{19.30} & \underline{27.46} & \underline{23.38} & 45.10 & 58.12 & 51.61 & \underline{49.80} & \underline{63.08} & \underline{56.44} & \underline{38.07} & \underline{49.55} & \underline{43.81} \\ 
@@ -631,14 +647,13 @@ TTRAG 的两种变体 TTRAG$_{\text{sk+docs}}$ 与 TTRAG$_{\text{sk+sens}}$ 在�
 
 \begin{table}[htbp]
   \centering
-  \caption{对 TTRAG 的不同设置进行消融研究。}
+  \caption{对 TTRAG 的不同设置进行消融研究}
   \label{table:ablation}
   \vspace{0.5em}\centering\wuhao
   % \resizebox{\linewidth}{!}{ 
   \begin{tabular}{@{}lcccccccc@{}}
   \toprule[1.5pt]
   \multirow{2}{*}{Method} & \multicolumn{2}{c}{Musique} & \multicolumn{2}{c}{2Wiki} & \multicolumn{2}{c}{HotpotQA} & \multicolumn{2}{c}{Average} \\
-  \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
    & EM & F1 & EM & F1 & EM & F1 & EM & F1 \\
   % \midrule
   % HippoRAG2$^\dagger$           & \underline{36.20} & \underline{50.92} & \underline{62.00} & \textbf{72.51} & \underline{58.50} & \underline{73.35} & \underline{52.23} & \underline{65.59} \\
@@ -678,14 +693,13 @@ F1 达到 66.88\%，取得显著提升。这一结果表明，本章方法与提
 
 \begin{table}[htbp]
   \centering
-  \caption{Llama-3-8B-Instruct 中不同上下文顺序的性能表现。}
+  \caption{Llama-3-8B-Instruct 中不同上下文顺序的性能表现}
   \label{table:order}
   \vspace{0.5em}\centering\wuhao
   % \resizebox{\linewidth}{!}{ 
     \begin{tabular}{@{}lcccccccc@{}}
     \toprule[1.5pt]
     \multirow{2}{*}{Method} & \multicolumn{2}{c}{Musique} & \multicolumn{2}{c}{2Wiki} & \multicolumn{2}{c}{HotpotQA} & \multicolumn{2}{c}{Average} \\
-    \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
       & EM & F1 & EM & F1 & EM & F1 & EM & F1 \\
     % \midrule
     % HippoRAG2$^\dagger$           & \underline{36.20} & \underline{50.92} & \underline{62.00} & \textbf{72.51} & \underline{58.50} & \underline{73.35} & \underline{52.23} & \underline{65.59} \\
@@ -719,11 +733,9 @@ F1 达到 66.88\%，取得显著提升。这一结果表明，本章方法与提
   \begin{tabular}{@{}lcccccccc@{}}
   \toprule[1.5pt]
   \multirow{2}{*}{Method} & \multicolumn{2}{c}{Musique} & \multicolumn{2}{c}{2Wiki} & \multicolumn{2}{c}{HotpotQA} & \multicolumn{2}{c}{Average} \\
-  \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
   & EM & F1 & EM & F1 & EM & F1 & EM & F1 \\
   \midrule[1pt]
   HippoRAG2           & \underline{36.20} & \underline{50.92} & \underline{62.00} & \textbf{72.51} & \underline{58.50} & \underline{73.35} & \underline{52.23} & \underline{65.59} \\
-  \midrule[1pt]
   TTRAG$_\text{tris}$           & 29.90 & 44.68 & 51.80 & 62.37 & 56.10 & 70.59 & 45.93 & 59.21 \\
   TTRAG$_\text{docs}$           & 31.90 & 44.77 & 53.30 & 64.07 & 56.60 & 71.14 & 47.27 & 59.99 \\
   TTRAG$_\text{tris+docs}$      & 33.00 & 46.45 & 54.60 & 65.59 & 56.80 & 71.48 & 48.13 & 61.17 \\
@@ -739,12 +751,19 @@ HippoRAG2 在不同数据集上的性能均受到一定程度的影响，其中�
 这进一步表明，在依赖 COT 与 few-shot 提示策略的设置下，模型更倾向于利用内部知识而非外部检索信息。
 因此，本章采用严格的 zero-shot 与基于上下文约束的生成方式，以确保不同方法之间的对比更加公平和可解释。
 
+如表\ref{table:app_result_hippo2}所示, “tris+alldocs” 表示结合使用推理路径与所有检索到的文档。
+在引入 CoT 与 few-shot 提示策略的设置下，
+TTRAG$_{\text{tris+alldocs}}$ 取得了最优整体性能。
+这表明 Thought 与 few-shot 提示在纯文本上下文场景中具有更强的性能提升作用。
+然而，即便在该设置下，引入 TTRAG 构建的短语结构三元组推理路径仍然能够在多个多跳问答基准上带来稳定的性能提升，
+验证了结构化推理信息的有效性。
+
 此外，表\ref{table:app_token_cost_hippo2} 对采用 HippoRAG2 COT+few-shot 提示策略时，不同设置下的输入 Token 长度进行了分析。
 结果表明，在引入短语结构三元组推理路径后，TTRAG$_{\text{tris+alldocs}}$ 的输入长度仅有小幅增加，但却带来了显著的性能提升。
 这说明基于短语结构三元组的结构化推理路径是一种高效的上下文压缩与知识表达方式，能够在控制计算成本的同时有效增强模型的多跳推理能力。
 
 \begin{table}[htbp]
-  \caption{采用 HippoRAG2 COT+few-shot 提示策略时，不同设置下输入 token 长度的对比。}
+  \caption{采用 HippoRAG2 COT+few-shot 提示策略时，不同设置下输入 token 长度的对比}
   \label{table:app_token_cost_hippo2}
   \vspace{0.5em}\centering\wuhao
   % \resizebox{\linewidth}{!}{ 
@@ -762,13 +781,6 @@ HippoRAG2 在不同数据集上的性能均受到一定程度的影响，其中�
   \end{tabular}
   % }
 \end{table}
-
-如表\ref{table:app_result_hippo2}所示, “tris+alldocs” 表示结合使用推理路径与所有检索到的文档。
-在引入 CoT 与 few-shot 提示策略的设置下，
-TTRAG$_{\text{tris+alldocs}}$ 取得了最优整体性能。
-这表明 Thought 与 few-shot 提示在纯文本上下文场景中具有更强的性能提升作用。
-然而，即便在该设置下，引入 TTRAG 构建的短语结构三元组推理路径仍然能够在多个多跳问答基准上带来稳定的性能提升，
-验证了结构化推理信息的有效性。
 
 \subsection{样例分析}[Case Study]
 
