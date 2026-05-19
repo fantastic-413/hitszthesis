@@ -710,11 +710,6 @@ F1 达到 66.88\%，取得显著提升。这一结果表明，本章方法与提
 在这种情况下，纯文本上下文通常更容易受益于该提示形式，而结构化的短语结构三元组输入则难以充分发挥其优势，
 从而影响对不同检索方式的公平比较。
 
-如表\ref{table:main_result_hippo} 与表\ref{table:app_result_hippo2} 的对比所示，
-HippoRAG2 在不同数据集上的性能均受到一定程度的影响，其中在 2WikiMultiHopQA 上的性能下降尤为明显。
-这进一步表明，在依赖 COT 与 few-shot 提示策略的设置下，模型更倾向于利用内部知识而非外部检索信息。
-因此，本章采用严格的 zero-shot 与基于上下文约束的生成方式，以确保不同方法之间的对比更加公平和可解释。
-
 \begin{table}[htbp]
   \centering
   \caption{采用 HippoRAG2 COT+few-shot 提示策略的实验结果}
@@ -739,12 +734,14 @@ HippoRAG2 在不同数据集上的性能均受到一定程度的影响，其中�
   % }
 \end{table}
 
-如表\ref{table:app_result_hippo2}所示, “tris+alldocs” 表示结合使用推理路径与所有检索到的文档。
-在引入 CoT 与 few-shot 提示策略的设置下，
-TTRAG$_{\text{tris+alldocs}}$ 取得了最优整体性能。
-这表明 Thought 与 few-shot 提示在纯文本上下文场景中具有更强的性能提升作用。
-然而，即便在该设置下，引入 TTRAG 构建的短语结构三元组推理路径仍然能够在多个多跳问答基准上带来稳定的性能提升，
-验证了结构化推理信息的有效性。
+如表\ref{table:main_result_hippo} 与表\ref{table:app_result_hippo2} 的对比所示，
+HippoRAG2 在不同数据集上的性能均受到一定程度的影响，其中在 2WikiMultiHopQA 上的性能下降尤为明显。
+这进一步表明，在依赖 COT 与 few-shot 提示策略的设置下，模型更倾向于利用内部知识而非外部检索信息。
+因此，本章采用严格的 zero-shot 与基于上下文约束的生成方式，以确保不同方法之间的对比更加公平和可解释。
+
+此外，表\ref{table:app_token_cost_hippo2} 对采用 HippoRAG2 COT+few-shot 提示策略时，不同设置下的输入 Token 长度进行了分析。
+结果表明，在引入短语结构三元组推理路径后，TTRAG$_{\text{tris+alldocs}}$ 的输入长度仅有小幅增加，但却带来了显著的性能提升。
+这说明基于短语结构三元组的结构化推理路径是一种高效的上下文压缩与知识表达方式，能够在控制计算成本的同时有效增强模型的多跳推理能力。
 
 \begin{table}[htbp]
   \caption{采用 HippoRAG2 COT+few-shot 提示策略时，不同设置下输入 token 长度的对比。}
@@ -766,9 +763,12 @@ TTRAG$_{\text{tris+alldocs}}$ 取得了最优整体性能。
   % }
 \end{table}
 
-此外，表\ref{table:app_token_cost_hippo2} 对采用 HippoRAG2 COT+few-shot 提示策略时，不同设置下的输入 Token 长度进行了分析。
-结果表明，在引入短语结构三元组推理路径后，TTRAG$_{\text{tris+alldocs}}$ 的输入长度仅有小幅增加，但却带来了显著的性能提升。
-这说明基于短语结构三元组的结构化推理路径是一种高效的上下文压缩与知识表达方式，能够在控制计算成本的同时有效增强模型的多跳推理能力。
+如表\ref{table:app_result_hippo2}所示, “tris+alldocs” 表示结合使用推理路径与所有检索到的文档。
+在引入 CoT 与 few-shot 提示策略的设置下，
+TTRAG$_{\text{tris+alldocs}}$ 取得了最优整体性能。
+这表明 Thought 与 few-shot 提示在纯文本上下文场景中具有更强的性能提升作用。
+然而，即便在该设置下，引入 TTRAG 构建的短语结构三元组推理路径仍然能够在多个多跳问答基准上带来稳定的性能提升，
+验证了结构化推理信息的有效性。
 
 \subsection{样例分析}[Case Study]
 
@@ -787,6 +787,9 @@ TTRAG$_{\text{tris+alldocs}}$ 取得了最优整体性能。
 这种“先构建结构、再补充语义”的两阶段过程，有效过滤了冗余信息并提升了知识密度，使得模型能够基于更精确、可控的上下文进行推理，
 从而显著提高问答准确性。同时，该过程提供了显式的推理路径，有助于提升模型决策过程的可解释性。
 
+不同推理类型性能分析（Performance Breakdown）：
+为进一步分析本章方法在不同推理类型下的性能表现，本章在 2WikiMultiHopQA 数据集上对不同推理类型的问题进行了 win--loss 分析。
+
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.8 \linewidth]{analysis_win_lose_type.pdf}
@@ -794,8 +797,6 @@ TTRAG$_{\text{tris+alldocs}}$ 取得了最优整体性能。
   \label{fig:winlose}
 \end{figure}
 
-不同推理类型性能分析（Performance Breakdown）：
-为进一步分析本章方法在不同推理类型下的性能表现，本章在 2WikiMultiHopQA 数据集上进行了 win--loss 分析。
 如\figref{fig:winlose} 所示，正值表示TTRAG回答正确而基线模型回答错误的样本，负值则表示相反的情况。
 相较于 HippoRAG2，本章方法在各类推理任务上均取得了整体性能提升。
 其中，在 Comparison 与 Compositional 问题上，性能提升最为显著。
