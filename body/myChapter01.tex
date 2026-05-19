@@ -22,7 +22,7 @@ LLMs 凭借其强大的语义理解能力与文本生成能力，在自然语言
 
 在知识密集型任务（Knowledge-Intensive Tasks）中，尤其是涉及多跳推理的问答任务，LLMs 的上述问题更加突出。
 模型在处理超出训练数据范围或需要跨文档推理的问题时，容易产生“幻觉”现象，
-即生成与事实不符的内容~\cite{knowledge-intensive, hallucinations, JSJA202401009, SDDZ201907054, DZZW202304001}。
+即生成与事实不符的内容~\cite{knowledge-intensive, hallucinations, JSJA202401009, SDDZ201907054}。
 为了解决这一问题，检索增强生成（Retrieval-Augmented Generation, RAG）方法被提出，
 如\figref{fig: 对比图}所示，相比于直接将用户问题输入进行LLMs生成，
 RAG方式通过从外部知识库动态检索相关信息，并将其作为上下文输入模型，能够提示模型利用最新、相关的知识进行推理与生成，
