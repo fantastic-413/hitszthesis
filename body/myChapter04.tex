@@ -129,9 +129,7 @@ LinearRAG\cite{linearrag} 提出以“线性图”为核心的轻量化建模方
 实体语义信息则用于增强语义覆盖范围，
 从而实现结构信息与语义信息的联合建模。
 
-\subsection{任务定义}
-
-给定检索得到的文档集合：
+任务定义：给定检索得到的文档集合：
 \begin{equation}
 \mathcal{D}_k = \{d_1,d_2,\dots,d_k\},
 \end{equation}
@@ -502,7 +500,7 @@ $\text{Concat}(\cdot)$ 表示上下文拼接函数。
 
 本章采用两个指标对方法进行评估：Contain-Acc.（包含匹配准确率）和GPT-Acc.（基于大语言模型的评估准确率）。
 
-\myparagraph{Contain-Acc}
+（1）Contain-Acc.：
 用于衡量生成答案是否包含标准答案，是一种宽松匹配指标。对于给定问题，若预测答案 $A_{pred}$ 中包含任一标准答案 $A_{true}$，
 则视为预测正确。其定义如下：
 \begin{equation}
@@ -511,7 +509,7 @@ $\text{Concat}(\cdot)$ 表示上下文拼接函数。
 
 \noindent 其中，$\text{Contain-Acc.}$ 表示包含准确率指标，$\mathbb{I}(\cdot)$ 为指示函数，当条件成立时取值为 1，否则为 0。最终结果为所有样本上的平均值。
 
-\myparagraph{GPT-Acc}
+（2）GPT-Acc.：
 是一种基于大语言模型的评估指标，用于衡量预测答案与标准答案在语义层面的匹配程度。
 具体而言，采用 GPT-4o-mini 或 Llama3-8B-Instruct 作为评估器，对预测答案 $A_{pred}$ 与标准答案 $A_{true}$ 进行比较，并输出判断结果：
 \begin{equation}
@@ -526,25 +524,21 @@ $\text{Concat}(\cdot)$ 表示上下文拼接函数。
 
 本章将所提出的 JS-LinearRAG 方法与多种具有代表性的 RAG 方法进行对比，这些方法覆盖了从传统密集检索到图结构增强检索的不同技术路线。
 
-\begin{itemize}
-
-\item \textbf{Dense Retrieval (Naive RAG)}
+（1）Dense Retrieval (Naive RAG)：
 基于向量相似度的经典检索增强生成方法。
 该方法直接将查询与文档编码为向量，通过相似度检索相关文本，并将其拼接作为上下文输入大语言模型进行回答，不涉及结构化建模。
 
-\item \textbf{LightRAG}\cite{lightrag}
+（2）LightRAG\cite{lightrag}：
 一种轻量级图结构 RAG 。
 
-\item \textbf{HippoRAG}\cite{hipporag}
+（3）HippoRAG\cite{hipporag}：
 受人类记忆机制启发的检索框架，将非结构化文本转化为知识图谱，并通过个性化 PageRank 算法进行多跳检索。
 
-\item \textbf{GFM-RAG}\cite{gfm-rag}
+（4）GFM-RAG\cite{gfm-rag}：
 一种基于图结构优化的 RAG 方法，通过引入图神经网络与结构约束，对检索过程进行建模与优化，从而提升多跳推理的准确性与泛化能力。
 
-\item \textbf{HippoRAG2}\cite{hipporag2}
+（5）HippoRAG2\cite{hipporag2}：
 在 HippoRAG 原有图结构基础上引入段落节点及“包含关系”边，同时融合语义相似度与结构信息进行联合检索。
-
-\end{itemize}
 
 \subsection{性能实验结果及分析}
 
@@ -1041,7 +1035,7 @@ js 表示联合语义上下文（joint semantic context），pst 表示短语结
 \end{table}
 
 
-\myparagraph{联合语义信息抽取的有效性}
+（1）联合语义信息抽取的有效性：
 首先，对比 LinearRAG$_{\text{ent}}$、LinearRAG$_{\text{pst}}$ 与 LinearRAG$_{\text{ent+pst}}$ 三种设置可以观察到，
 相比仅使用单一实体或短语结构三元组，
 联合短语结构三元组与实体语义信息后整体性能呈现稳定提升趋势。
@@ -1062,7 +1056,7 @@ GPT-Acc. 达到 66.20\%，达到最佳结果。
 从而提升检索质量与答案生成能力。
 因此，第4.2节提出的联合语义信息抽取机制能够为后续检索增强生成提供更加丰富的语义基础。
 
-\myparagraph{句子加权表示的影响}
+（2）句子加权表示的影响：
 在语义信息抽取基础上，
 进一步引入句子加权段落表示后，
 模型性能继续提升。
@@ -1079,7 +1073,7 @@ MuSiQue 数据集上的 Avg 指标由 33.20\% 提升至 36.40\%，
 从而提升段落表示质量。
 这验证了第4.3节提出的句子加权表示方法在语义表示精度方面的有效性。
 
-\myparagraph{联合语义上下文构建的作用}
+（3）联合语义上下文构建的作用：
 进一步引入联合语义上下文构建后，
 模型整体性能获得持续提升。
 LinearRAG$_{\text{ent+js}}$ 在 2WikiMultiHopQA 数据集上取得 68.55\% 的最高 Avg 指标，
@@ -1109,7 +1103,7 @@ Contain-Acc. 达到 70.50\%，
 句子级表示优化与联合语义上下文构建能够形成更强的互补作用，
 共同提升复杂多跳问答任务中的检索与推理表现。
 
-\myparagraph{短语结构三元组结构增强的影响}
+（4）短语结构三元组结构增强的影响：
 进一步分析结构增强的 JS-LinearRAG$_{\text{pst}}$，
 模型在部分高复杂度任务上展现出进一步提升。
 JS-LinearRAG$_{\text{pst}}$ 在 MuSiQue 数据集上取得最高 Avg（38.25\%），

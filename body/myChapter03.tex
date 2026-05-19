@@ -115,7 +115,7 @@ $r_j \in \mathcal{R}$。
 并为后续答案生成提供可解释的结构基础。
 \end{definition}
 
-\myparagraph{任务定义}
+任务定义：
 给定自然语言问题 $q$ 与短语结构三元组图 $\mathcal{G}$，
 本章任务旨在从图中检索与问题相关的结构化推理路径集合：
 \begin{equation}
@@ -132,7 +132,7 @@ $\mathcal{A}_q$ 表示针对问题 $q$ 的答案。
 通过显式结构化推理路径，
 模型能够在保持知识可解释性的同时提升复杂推理能力。
 
-\myparagraph{文档检索}
+文档检索：
 给定查询 $q$ 与文档集合 $\mathcal{D}$，
 首先利用检索器 $\mathcal{R}$ 获取相关性最高的前 $k$ 个文档：
 \begin{equation}
@@ -441,8 +441,7 @@ $\mathcal{S}$ 表示推理路径集合，$\mathcal{C}$ 表示基于推理路径�
 
 \subsection{数据集}[Datasets]
 
-本章在三个典型的多跳问答基准数据集上对方法进行评估，
-包括 MuSiQue\cite{musique} 、2WikiMultiHopQA\cite{2wikimultihopqa}  和 HotpotQA\cite{hotpotqa}。
+本章在三个典型的多跳问答基准数据集 MuSiQue\cite{musique} 、2WikiMultiHopQA\cite{2wikimultihopqa}  和 HotpotQA\cite{hotpotqa}上对方法进行评估，
 实验设置遵循 HippoRAG2\cite{hipporag2} 的配置，从每个数据集的验证集中随机采样 1000 条查询进行评估，
 所有查询均涉及多跳推理任务。
 
@@ -479,7 +478,7 @@ MuSiQue-Ans 版本包含约 248,814 条问答样本，其核心特点在于强�
 在主实验中，所有方法均基于 GPT-4o-mini 和 Llama-3-8B-Instruct 两种大语言模型进行测试。
 本章采用多跳问答任务中常用的两种评价指标：精确匹配（Exact Match, EM）与 F1 分数（F1 Score）。
 
-\myparagraph{EM}
+（1）EM：
 对于每个问题，EM 指标为二值指标。当模型预测答案与任一真实答案完全一致时，记为正确，否则为错误。
 设预测答案为 $A_{\text{pred}}$，真实答案集合为 $\mathcal{A}_{\text{true}}$，则单个样本的 EM 计算如下：
 \begin{equation}
@@ -488,7 +487,7 @@ MuSiQue-Ans 版本包含约 248,814 条问答样本，其核心特点在于强�
 
 \noindent 其中，$\text{EM}$ 表示精确匹配分数，$\mathbb{I}(\cdot)$ 为指示函数，当条件成立时取值为 $1$，否则为 $0$。最终 EM 分数为所有样本的平均值。
 
-\myparagraph{F1}
+（2）F1：
 F1 分数用于衡量预测答案与真实答案之间的词级重叠程度，将答案视为词集合进行计算。相较于 EM 指标，F1 更为宽松。
 设预测答案为 $A_{\text{pred}}$，真实答案为 $A_{\text{true}}$，则精确率（Precision）与召回率（Recall）定义为：
 \begin{equation}
@@ -516,30 +515,26 @@ F1 分数用于衡量预测答案与真实答案之间的词级重叠程度，�
 
 本章将所提出的 TTRAG 方法与多种具有代表性的RAG方法进行对比。这些基线方法涵盖了基于图结构的方法、层次化检索方法，以及不依赖外部知识的直接生成方法。
 
-\begin{itemize}
-
-\item \textbf{None（Direct Generation, GPT-4o-mini）}  
+（1）None（Direct Generation, GPT-4o-mini）：
 以基础大语言模型作为对照，不引入任何检索或外部知识，直接根据输入问题生成答案。
 
-\item \textbf{GraphRAG}\cite{graphrag}
+（2）GraphRAG\cite{graphrag}：
 一种基于知识图谱的RAG框架，通过抽取实体与关系构建全局知识图谱，并结合查询导向摘要（Query-Focused Summarization, QFS）进行信息整合。该方法利用Leiden算法进行社区划分，对子图进行层次化总结，并在推理阶段通过映射与归约（Mapping–Reduction）机制生成最终答案。
 
-\item \textbf{RAPTOR}\cite{raptor}  
+（3）RAPTOR\cite{raptor}：
 一种基于递归抽象的层次化检索方法，将长文本组织为树结构。该方法通过SBERT向量表示与高斯混合模型（Gaussian Mixture Model, GMM）对文本进行聚类，并在不同层级生成摘要。在检索阶段，自顶向下遍历相关节点，从而整合多层次上下文信息以支持复杂推理。
 
-\item \textbf{LightRAG}\cite{lightrag}
+（4）LightRAG\cite{lightrag}：
 一种轻量级图结构RAG方法，结合图索引与双层检索机制。该方法利用大语言模型抽取实体与关系构建动态知识图谱，并通过底层实体查询与高层关系聚合实现高效检索，在保证推理能力的同时减少冗余信息。
 
-\item \textbf{HippoRAG}\cite{hipporag}
+（5）HippoRAG\cite{hipporag}：
 一种受海马体记忆机制启发的检索框架，将大语言模型与知识图谱及个性化PageRank（Personalized PageRank）相结合。该方法通过OpenIE构建开放领域知识图谱，并引入同义词边进行扩展，利用基于实体的PageRank算法实现多跳推理。
 
-\item \textbf{HippoRAG2}\cite{hipporag2}
+（6）HippoRAG2\cite{hipporag2}：
 HippoRAG的改进版本，引入段落节点与“contains”关系以增强图结构表达能力，同时融合语义相似度与结构信息。在检索阶段，通过实体与短语联合初始化PageRank，并结合大语言模型进行三元组过滤，从而提升事实推理与关系推理能力。
 
-\item \textbf{KET-RAG}\cite{ketrag}
+（7）KET-RAG\cite{ketrag}：
 一种低成本、多粒度图索引方法。该方法首先构建文本块的KNN图，并抽取实体关系三元组形成轻量级图推理路径。在检索阶段，将上下文预算划分为图结构局部搜索与关键词检索两部分，从而在较低索引成本下实现高效检索。
-
-\end{itemize}
 
 \subsection{性能实验结果与分析}[Main Results and Analysis]
 
@@ -585,7 +580,7 @@ HippoRAG的改进版本，引入段落节点与“contains”关系以增强图�
   }
 \end{table}
 
-\myparagraph{问答性能分析（QA Performance）}
+（1）问答性能分析（QA Performance）：
 实验结果表明，本章提出的 TTRAG 方法在多个基准数据集上均显著优于现有方法。
 在使用 GPT-4o-mini 时，TTRAG 的两个变体 TTRAG$_{\text{sk+docs}}$ 和 TTRAG$_{\text{sk+sens}}$ 
 均取得了最优或接近最优的整体表现。其中，TTRAG$_{\text{sk+sens}}$ 在平均 EM 指标上取得最高值 48.80\%，
@@ -594,7 +589,7 @@ TTRAG$_{\text{sk+docs}}$ 在平均 F1 指标以及平均 Avg 指标上表现最�
 在开源模型 Llama-3-8B-Instruct 上，TTRAG$_{\text{sk+sens}}$ 在 2WikiMultiHopQA 和 HotpotQA 数据集上均取得最佳表现，并获得最高的整体平均分。
 这表明本章方法能够有效构建结构化知识表示，从而显著提升大语言模型在复杂多跳推理任务中的理解与问答能力。
 
-\myparagraph{TTRAG 变体对比分析}
+（2）TTRAG 变体对比分析：
 TTRAG 的两种变体 TTRAG$_{\text{sk+docs}}$ 与 TTRAG$_{\text{sk+sens}}$ 在不同模型上的表现差异，主
 要取决于大语言模型的能力水平。这两种方法的核心区别在于上下文粒度：
 前者采用文档级证据，提供更丰富的上下文信息，但同时会引入更多噪声；
@@ -618,7 +613,7 @@ TTRAG 的两种变体 TTRAG$_{\text{sk+docs}}$ 与 TTRAG$_{\text{sk+sens}}$ 在�
   \label{fig:token_cost_hippo2}
 \end{figure}
 
-\myparagraph{Token 消耗分析（Token Cost）}
+（3）Token 消耗分析（Token Cost）：
 如\figref{fig:token_cost_hippo2} 所示，柱状图表示 Token 数量，折线表示 EM 分数。
 本章方法在显著提升性能的同时，有效降低了 Token 消耗。
 相较于表现较优的基线方法 HippoRAG2，TTRAG 在保持甚至提升问答性能的情况下，将平均输入 Token 长度减少约 80\%。
@@ -628,7 +623,6 @@ TTRAG 的两种变体 TTRAG$_{\text{sk+docs}}$ 与 TTRAG$_{\text{sk+sens}}$ 在�
 
 \subsection{消融实验结果与分析}[Ablation Study]
 
-\myparagraph{TTRAG 关键模块有效性分析}
 为验证本章方法各组成模块的有效性，本章对 TTRAG 的不同组件进行消融实验，结果如表\ref{table:ablation} 所示，
 ``$\dagger$''表示按照 HippoRAG2 设置，采用 CoT 和少刺激提示来引出 LLM 的内部知识。
 “tris+alldocs” 表示结合使用推理路径与所有检索到的文档。
@@ -670,7 +664,7 @@ TTRAG 的两种变体 TTRAG$_{\text{sk+docs}}$ 与 TTRAG$_{\text{sk+sens}}$ 在�
 实验结果显示，在引入 CoT（Chain-of-Thought）与 few-shot 提示后，TTRAG$_{\text{sk+alldocs}}$ 的平均 EM 提升至 54.50\%，
 F1 达到 66.88\%，取得显著提升。这一结果表明，本章方法与提示工程策略具有良好的兼容性，能够进一步激发大语言模型的推理能力。
 
-\myparagraph{上下文组织方式影响分析}
+（1）上下文组织方式影响分析：
 为探究上下文组织方式对模型性能的影响，本章设计了两种新的上下文排列方式。
 第一种方法 $\text{TTRAG}_{\text{sk+sens+alt}}$ 采用短语结构三元组与对应文本句子交替排列的方式；
 第二种方法 $\text{TTRAG}_{\text{sk+sens+contain}}$ 在短语结构三元组与文本基础上进一步引入显式的“包含关系”标注。
@@ -707,7 +701,7 @@ F1 达到 66.88\%，取得显著提升。这一结果表明，本章方法与提
 综上所述，上下文结构优化虽能在一定程度上改善模型表现，但其效果依赖于任务复杂度。
 对于复杂多跳推理任务，仍需依赖更强的结构化推理机制与高质量证据筛选策略。
 
-\myparagraph{Zero-shot 设置与提示设计分析}
+（2）Zero-shot 设置与提示设计分析：
 在本章实验中，我们采用 zero-shot 设置，并明确约束大语言模型仅基于给定上下文生成答案。
 该设计旨在尽可能隔离模型参数知识的影响，从而更加公平地评估检索信息在 RAG 框架中的实际贡献。
 
@@ -778,7 +772,6 @@ TTRAG$_{\text{tris+alldocs}}$ 取得了最优整体性能。
 
 \subsection{样例分析}[Case Study]
 
-\myparagraph{可解释性分析}
 如图~\ref{fig:explain} 所示，传统基于文本的 RAG 方法在处理长上下文时，往往会引入大量无关信息，
 从而产生显著噪声，干扰大语言模型对关键信息的提取，进而影响最终问答结果的准确性。
 
@@ -801,7 +794,7 @@ TTRAG$_{\text{tris+alldocs}}$ 取得了最优整体性能。
   \label{fig:winlose}
 \end{figure}
 
-\myparagraph{不同推理类型性能分析（Performance Breakdown）}
+不同推理类型性能分析（Performance Breakdown）：
 为进一步分析本章方法在不同推理类型下的性能表现，本章在 2WikiMultiHopQA 数据集上进行了 win--loss 分析。
 如\figref{fig:winlose} 所示，正值表示TTRAG回答正确而基线模型回答错误的样本，负值则表示相反的情况。
 相较于 HippoRAG2，本章方法在各类推理任务上均取得了整体性能提升。
