@@ -71,16 +71,15 @@
 % 中文摘要
 \begin{cabstract}
 
-  随着大语言模型（Large Language Models, LLMs）的快速发展，其在自然语言处理任务中展现出强大的能力。
-  然而，由于模型参数知识的静态性以及对复杂推理任务的局限性，
-  LLMs 在知识密集型多跳问答任务中仍面临知识过时、推理能力不足以及易产生幻觉等问题。
-  检索增强生成（Retrieval-Augmented Generation, RAG）通过引入外部知识缓解了上述问题，
-  但现有的 RAG 方法在复杂场景下仍存在上下文噪声较大、语义表达不足以及推理能力有限等挑战。
-
+  随着大语言模型（Large Language Models, LLMs）的快速发展，其在自然语言处理等多个领域中表现出良好的性能。
+  然而，由于蕴含在模型参数中知识的静态性，LLMs 容易因知识过时而产生“幻觉”现象。
+  检索增强生成（Retrieval-Augmented Generation, RAG）通过引入外部知识增强了 LLMs 生成结果的事实性与可靠性，
+  但现有的 RAG 方法在知识密集型多跳推理任务等复杂场景下仍存在上下文噪声较大、语义表达能力不足以及推理能力有限等问题。
   针对上述问题，本文围绕“结构分析”与“语义分析”两个方向展开研究，提出了两种改进方法。
-  首先，针对文本上下文信噪比较低的问题，提出了一种基于结构分析的检索增强生成方法。
-  该方法通过从文本中抽取短语结构三元组图，构建结构化推理路径，并基于推理路径精确索引相关文本，
-  实现“结构引导 + 文本补充”的上下文构建方式。
+
+  针对复杂多跳问答任务中上下文信噪比较低的问题，提出了一种基于结构分析的检索增强生成方法。
+  通过从检索文档中抽取短语结构三元组，构建结构化推理路径，并基于推理路径精确索引相关文本，
+  构建“结构引导+文本补充”的增强上下文表示，以提高知识密度，降低上下文噪声。
   在三个典型多跳问答数据集 MuSiQue、2WikiMultiHopQA 和 HotpotQA 上的实验结果表明，
   所提出的方法在各项指标上均优于对比方法。
   其中，在 2WikiMultiHopQA 数据集上，EM 和 F1 分别达到 55.20\% 和 65.09\%，
@@ -89,63 +88,42 @@
   同时，在保证性能的前提下，所提出的方法将平均输入 Token 长度减少约 70\%--80\%，
   显著提升了推理效率与结果可解释性。
 
-  进一步地，针对图结构方法依赖复杂关系建模且构建成本较高的问题，
-  本文提出了一种基于结构与语义联合建模的检索增强生成方法。
-  该方法在 LinearRAG 框架基础上，
-  以短语结构三元组与文本片段为基础，
-  进一步引入实体与短语语义信息抽取机制，
+  针对基于图结构的 RAG 方法依赖复杂关系建模且构建成本较高的问题，
+  提出了一种基于结构与语义联合建模的检索增强生成方法。
+  在短语结构三元组和文本片段的基础上，
+  引入实体语义信息抽取，
   并提出基于句子加权的段落表示方法，
   构建“结构 + 文本 + 语义”联合增强上下文，
-  实现对结构信息、文本信息与语义信息的统一建模。
-  在 MuSiQue、2WikiMultiHopQA 和 HotpotQA 数据集上的实验结果表明，
-  所提出的方法在整体性能上优于多种基准方法。
-  在三数据集平均指标上，
+  提升上下文的信息密度与表达能力。
+  在 MuSiQue、2WikiMultiHopQA 和 HotpotQA 数据集上进行实验，
   所提出的方法的包含匹配准确率（Contain-Acc.）和
-  基于大语言模型的评估准确率（GPT-Acc.）分别达到 58.57\% 和 57.93\%，
-  整体平均性能达到 58.25\%。
-  在无需显式推理路径的情况下，
-  该方法在保持较低检索成本的同时，
-  有效提升了信息密度、推理能力与生成性能。
+  大语言模型评估准确率（GPT-Acc.）分别达到 58.57\% 和 57.93\%，
+  在整体性能上优于多种基准方法。
+  所提出的方法在保持较低检索成本的同时，有效提升了大语言模型的推理能力与生成性能。
 
 \end{cabstract}
 
 % 英文摘要
 \begin{eabstract}
 
-  With the rapid development of Large Language Models (LLMs), 
-  they have demonstrated strong capabilities across a wide range of natural language processing tasks. 
-  However, due to the static nature of their parametric knowledge and their limitations in handling complex reasoning tasks, 
-  LLMs still face challenges in knowledge-intensive multi-hop question answering, 
-  including outdated knowledge, insufficient reasoning ability, and susceptibility to hallucinations. 
-  Retrieval-Augmented Generation (RAG) alleviates these issues by incorporating external knowledge. 
-  Nevertheless, existing RAG methods still suffer from high context noise, insufficient semantic representation, and limited reasoning capability in complex scenarios.
+  With the rapid development of Large Language Models (LLMs), they have demonstrated strong performance in many fields such as natural language processing.
+  However, due to the static nature of knowledge stored in model parameters, LLMs are prone to generating hallucinations caused by outdated knowledge.
+  Retrieval-Augmented Generation (RAG) enhances the factuality and reliability of LLM-generated results by introducing external knowledge.
+  Nevertheless, existing RAG methods still suffer from issues such as excessive contextual noise, insufficient semantic representation capability, and limited reasoning ability in complex scenarios including knowledge-intensive multi-hop reasoning tasks.
+  To address these challenges, this thesis conducts research from two perspectives: structural analysis and semantic analysis, and proposes two improved methods.
 
-  To address these problems, this thesis conducts research from two perspectives: structural analysis and semantic analysis, and proposes two improved methods.
-  First, to address the low signal-to-noise ratio in textual contexts, a retrieval-augmented generation method based on structural analysis is proposed.
-  This method extracts phrase-structured triple graphs from retrieved documents, constructs structured reasoning paths, and accurately indexes relevant textual evidence based on these reasoning paths,
-  thereby forming a context construction paradigm of “structure-guided + text-enriched.”
-  Experimental results on three representative multi-hop question answering benchmarks, 
-  namely MuSiQue, 2WikiMultiHopQA, and HotpotQA, 
-  demonstrate that the proposed method consistently outperforms baseline approaches across all evaluation metrics. 
-  In particular, on the 2WikiMultiHopQA dataset, it achieves an EM of 55.20\% and an F1 of 65.09\%, 
-  outperforming the second-best method by 2.80\% and 3.76\%, respectively. 
-  The overall average performance across all datasets reaches 55.20\%, achieving the best overall results. 
-  Meanwhile, the proposed method reduces the average input token length by approximately 70\%--80\% without sacrificing performance, 
-  thereby significantly improving reasoning efficiency and interpretability.
+  To address the low signal-to-noise ratio of context in complex multi-hop question answering tasks, this thesis proposes a retrieval-augmented generation method based on structural analysis.
+  By extracting phrase-structured triples from retrieved documents, the method constructs structured reasoning paths and accurately indexes relevant texts based on these reasoning paths.
+  A “structure-guided + text-supplemented” enhanced context representation is then constructed to improve knowledge density and reduce contextual noise.
+  Experimental results on three representative multi-hop question answering benchmarks, namely MuSiQue, 2WikiMultiHopQA, and HotpotQA, demonstrate that the proposed method consistently outperforms competing approaches across all evaluation metrics.
+  Specifically, on the 2WikiMultiHopQA dataset, the proposed method achieves an EM score of 55.20\% and an F1 score of 65.09\%, surpassing the second-best method by 2.80\% and 3.76\%, respectively.
+  The proposed method achieves an average overall performance of 55.20\% across all datasets, obtaining the best comprehensive performance.
+  Meanwhile, while maintaining strong performance, the proposed method reduces the average input token length by approximately 70\%--80\%, significantly improving reasoning efficiency and result interpretability.
 
-  Furthermore, to address the high construction cost and complex relational modeling dependency of graph-based methods, 
-  this thesis proposes a retrieval-augmented generation method based on joint structural and semantic modeling.
-  Built upon the LinearRAG framework, this method takes phrase-structured triples and textual passages as the structural-textual foundation,
-  further introduces semantic extraction mechanisms for entities and phrases,
-  proposes a sentence-weighted paragraph representation approach,
-  and constructs a “structure + text + semantics” jointly enhanced context
-  to achieve unified modeling of structural, textual, and semantic information.
-  Experimental results on MuSiQue, 2WikiMultiHopQA, and HotpotQA demonstrate that the proposed method consistently outperforms multiple baseline approaches in overall performance.
-  On the averaged results over the three datasets, the proposed method achieves 
-  a Containment Matching Accuracy (Contain-Acc.) of 58.57\% and 
-  a Large Language Model-based Evaluation Accuracy (GPT-Acc.) of 57.93\%, 
-  with an overall average performance of 58.25\%.
-  Without relying on explicit reasoning paths, 
-  the method effectively improves information density, reasoning capability, and generation performance while maintaining relatively low retrieval cost.
-
+  To address the high construction cost and complex relational modeling dependency of graph-based RAG methods, this thesis further proposes a retrieval-augmented generation method based on joint structural and semantic modeling.
+  Built upon phrase-structured triples and text passages, the method further introduces entity-level semantic information extraction and proposes a sentence-weighted paragraph representation approach.
+  A jointly enhanced context integrating “structure + text + semantics” is then constructed to improve context knowledge density and semantic representation capability.
+  Experimental results on MuSiQue, 2WikiMultiHopQA, and HotpotQA show that the proposed method achieves a Containment Matching Accuracy (Contain-Acc.) of 58.57\% and a Large Language Model-based Evaluation Accuracy (GPT-Acc.) of 57.93\%, outperforming multiple baseline methods in overall performance.
+  While maintaining relatively low retrieval cost, the proposed method effectively improves the reasoning ability and generation performance of large language models.
+  
 \end{eabstract}

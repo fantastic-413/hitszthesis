@@ -5,18 +5,18 @@
 
 \section{引言}[Introduction]
 
-通过引入外部知识，RAG 有效缓解了大语言模型在知识过时与事实性错误方面的局限，使其在知识密集型任务中取得了显著进展。
-然而，在复杂多跳问答等任务中，现有 RAG 方法仍面临上下文噪声较大、语义表达不充分以及推理能力受限等问题。
+通过引入外部知识，RAG 有效缓解了大语言模型在知识过时与事实性错误方面的局限。
+然而，在知识密集型多跳推理任务等复杂场景下，现有 RAG 方法面临上下文噪声较大、语义表达不充分以及推理能力不足等问题。
 为提升 RAG 系统的推理能力，研究者逐渐引入结构化知识建模方法，通过构建知识图谱或语义图结构来组织检索信息，
 从而增强多跳推理能力。这类方法能够显式建模实体及其关系，在一定程度上改善了传统 RAG 在复杂推理任务中的表现。
 然而，由于知识图谱构建过程中存在信息抽取误差及结构不一致等问题，基于结构化知识的方法仍然容易引入噪声，并带来额外的计算开销。
-与此同时，大语言模型自身的推理机制、文本表示方式以及信息抽取技术，也在检索增强生成过程中发挥着重要作用。
-向量化表示与相似度检索为 RAG 提供了基础的语义匹配能力，但其往往忽略文本内部的结构信息；
+与此同时，大语言模型自身的上下文信息处理能力与复杂多跳任务推理能力，也在检索增强生成过程中发挥着重要作用。
+文本向量化表示与相似度检索为 RAG 提供了基础的语义匹配能力，但其容易忽略长文本内部的结构信息；
 命名实体识别与开放式信息抽取技术则为构建结构化知识提供了关键支撑，但也存在抽取质量不稳定的问题。
 如何在结构化知识与原始文本语义之间实现有效融合，成为当前研究的核心挑战之一。
 
-基于上述背景，本章从检索增强生成方法、结构化知识建模、大语言模型推理机制、文本表示与向量检索技术
-，以及实体识别与开放式信息抽取等方面，对相关研究进行系统梳理与分析，为后续研究工作提供理论基础与技术支撑。
+基于上述背景，本章从检索增强生成技术、文本表示与向量检索技术以及知识图谱构建技术等方面，
+对相关研究进行系统梳理与分析，为后续研究工作提供理论基础与技术支撑。
 
 \section{检索增强生成技术}[RAG techniques]
 
@@ -53,19 +53,20 @@ DPR 使用双编码器分别对问题和文本块进行编码，并通过向量�
 
 在生成模块上，朴素 RAG 既可以采用像 RAG 这样的“边检索边生成”方式，也可以采用将多个检索结果进行融合后再解码的方式。
 Izacard\cite{izacard2021leveraging} 等人提出的 FiD（Fusion-in-Decoder）通过分别编码多个检索文本块，
-并在解码阶段进行融合，显著提升了开放域问答性能，其框架如\figref{fig: FiD 框架图}所示。
+并在解码阶段进行融合，显著提升了开放域问答性能。
+% 其框架如\figref{fig: FiD 框架图}所示。
 后续 Atlas 则在此基础上进一步展示了检索增强模型在少样本知识密集型任务中的优势，
 而 RETRO 则把检索更深地集成到语言模型架构中，通过从大规模文本库中检索邻近文本块增强自回归建模能力。
 尽管这些方法在具体实现上有所不同，但本质上仍然遵循“从文本库中直接检索证据，再将文本证据输入生成模型”的朴素 RAG 思路。
 
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=0.98\textwidth]{fid框架图.png}
-	\caption{FiD 框架\cite{izacard2021leveraging}}
-	\label{fig: FiD 框架图}
-\end{figure}
+% \begin{figure}[htbp]
+% 	\centering
+% 	\includegraphics[width=0.98\textwidth]{fid框架图.png}
+% 	\caption{FiD 框架\cite{izacard2021leveraging}}
+% 	\label{fig: FiD 框架图}
+% \end{figure}
 
-朴素 RAG 的优势在于实现路径清晰、工程成本较低，并且能够方便地接入现有大语言模型或黑盒 API。
+朴素 RAG 的优势在于实现路径清晰、工程成本较低，并且能够方便地接入现有大语言模型。
 特别是在无需改动模型内部参数或结构的场景下，In-Context RALM 与 REPLUG 这类方法展示了较强的实用价值。
 与此同时，由于其知识源来自可更新的外部文本库，朴素 RAG 相比纯参数化大语言模型在知识时效性、可追溯性和可维护性方面具有明显优势。
 
@@ -99,7 +100,7 @@ KG-Rank 利用外部医学知识图谱 UMLS 替代传统 RAG 中的文本向量�
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=0.98\textwidth]{bio 框架图.png}
-	\caption{KG-RAG 框架\cite{hipporag}}
+	\caption{KG-RAG 框架\cite{soman2024biomedical}}
 	\label{fig: bio 框架图}
 \end{figure}
 
@@ -133,16 +134,16 @@ LightRAG 强调图结构上的低层实体检索与高层关系聚合，兼顾�
 典型做法包括：以问题中的实体为起点，在图中搜索相关邻居和关系路径；以图神经网络对局部子图进行编码，从而获取更加紧凑的检索表示；
 或通过图上的排序与传播机制，估计不同节点、边和路径的重要性。
 GNN-RAG 便是这一思路的代表，该方法利用图神经网络在知识图谱子图上执行稠密推理，先找到候选答案，
-其框架如\figref{fig: GNN-RAG架构图}所示，
+% 其框架如\figref{fig: GNN-RAG架构图}所示，
 再抽取连接问题实体与候选答案的最短路径，并将其语言化后输入大语言模型，从而实现“图推理 + 文本生成”的协同。
 类似地，GFM-RAG 则尝试利用图基础模型增强图表示与图检索能力，以改善复杂图结构上的泛化效果。
 
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=0.98\textwidth]{GNN-RAG架构图.png}
-	\caption{GNN-RAG 框架\cite{mavromatis2025gnn}}
-	\label{fig: GNN-RAG架构图}
-\end{figure}
+% \begin{figure}[htbp]
+% 	\centering
+% 	\includegraphics[width=0.98\textwidth]{GNN-RAG架构图.png}
+% 	\caption{GNN-RAG 框架\cite{mavromatis2025gnn}}
+% 	\label{fig: GNN-RAG架构图}
+% \end{figure}
 
 在上下文构建层面，基于知识图谱的方法通常会将结构化知识与文本证据结合使用，而不是仅返回图中的节点或边。
 一方面，知识图谱中的路径、子图和社区摘要能够为问题提供更清晰的逻辑框架；
@@ -173,14 +174,15 @@ LightRAG 则通过图结构引导文本检索，增强上下文的可解释性�
 为此，Reimers\cite{reimers2019sentence} 等人提出了 Sentence-BERT（SBERT），通过孪生网络结构学习句子级向量表示，
 使文本能够直接在向量空间中进行相似度比较，大幅提升了语义检索与聚类等任务的效率。
 此后，MPNet\cite{mpnet} 进一步结合掩码语言建模与排列语言建模的优点，提高了预训练表示的语义质量，
-也成为后续多种句向量模型的重要基础，其框架如\figref{fig: MPNets框架图}所示。
+也成为后续多种句向量模型的重要基础。
+% 其框架如\figref{fig: MPNets框架图}所示。
 
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=0.55\textwidth]{MPNets框架图.png}
-	\caption{MPNets 框架\cite{mpnet}}
-	\label{fig: MPNets框架图}
-\end{figure}
+% \begin{figure}[htbp]
+% 	\centering
+% 	\includegraphics[width=0.55\textwidth]{MPNets框架图.png}
+% 	\caption{MPNets 框架\cite{mpnet}}
+% 	\label{fig: MPNets框架图}
+% \end{figure}
 
 在检索任务中，稠密表示通常通过双编码器（dual-encoder）框架实现。其基本思想是分别对查询和候选文本进行独立编码，
 再通过向量内积或余弦相似度计算两者相关性。
@@ -216,7 +218,7 @@ FAISS\cite{faiss} 是这一方向中应用最广泛的工具之一，它支持�
 尤其是在多跳问答场景中，如果缺乏对实体、短语或局部语义结构的进一步建模，仅依赖整体向量表示容易导致关键证据被淹没于冗余上下文中。
 正因如此，如何在向量检索的基础上进一步引入更细粒度的语义表示与结构化建模，成为本文后续研究的重要出发点。
 
-\section{命名实体识别与开放式信息抽取技术}
+\section{知识图谱构建技术}
 
 命名实体识别（Named Entity Recognition, NER）
 与开放式信息抽取是构建结构化知识表示的重要基础技术。
@@ -245,36 +247,22 @@ Y^{*} = \arg\max_{Y} P(Y \mid X),
 
 \noindent 其中，$Y^{*}$ 表示在给定输入序列 $X$ 条件下的最优标签序列，$P(Y \mid X)$ 表示标签序列 $Y$ 在输入序列 $X$ 条件下的条件概率，$\arg\max$ 表示选择使条件概率最大的标签序列。
 
-如\figref{fig: NER框架}所示，展示了命名实体识别任务的基本流程。
 早期命名实体识别方法主要依赖人工设计特征和统计学习模型，如条件随机场（Conditional Random Field, CRF）等。
 这类方法需要结合词性、词形、上下文窗口以及词典特征进行建模，具有较强可解释性，但对特征工程依赖较强，迁移能力有限。
 随着深度学习的发展，基于双向长短期记忆网络（BiLSTM）与 CRF 的神经序列标注模型逐渐成为主流\cite{lample2016neural}。
 Lample 等人提出的 BiLSTM-CRF 架构表明，在无需复杂人工特征的前提下，
 仅利用字符级表示与词向量即可在多个 NER 基准上取得优异效果。
 
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=0.90\textwidth]{命名实体识别.png}
-	\caption{命名实体识别基本流程}
-	\label{fig: NER框架}
-\end{figure}
+% \begin{figure}[htbp]
+% 	\centering
+% 	\includegraphics[width=0.90\textwidth]{命名实体识别.png}
+% 	\caption{命名实体识别基本流程}
+% 	\label{fig: NER框架}
+% \end{figure}
 
 在此基础上，预训练语言模型进一步推动了 NER 技术的发展。
 BERT 通过双向 Transformer 预训练获得上下文相关表示，使得 NER 能够充分利用更丰富的上下文语义信息。
 基于 BERT 的命名实体识别通常将输入文本编码为上下文向量，再在输出层进行逐位置分类，或结合 CRF 层建模标签之间的依赖关系。
-
-设 BERT 编码器输出的上下文表示为
-\begin{equation}
-\mathbf{H} = \{\mathbf{h}_1, \mathbf{h}_2, \dots, \mathbf{h}_n\},
-\end{equation}
-
-\noindent 其中，$\mathbf{H}$ 表示输入序列经过 BERT 编码后的上下文表示集合，$\mathbf{h}_i$ 表示第 $i$ 个词或子词对应的上下文向量表示，$n$ 表示输入序列长度。
-则每个位置的标签概率可表示为
-\begin{equation}
-P(y_i \mid X) = \text{Softmax}(W \mathbf{h}_i + b),
-\end{equation}
-
-\noindent 其中，$P(y_i \mid X)$ 表示在输入序列 $X$ 条件下第 $i$ 个位置标签为 $y_i$ 的概率，$\text{Softmax}(\cdot)$ 表示归一化分类函数，$W$ 表示分类层的权重矩阵，$b$ 表示偏置项，$\mathbf{h}_i$ 表示第 $i$ 个位置的上下文表示向量。
 BERT 及其变体在命名实体识别任务中显著提升了性能，尤其适用于上下文依赖较强的复杂实体识别场景。
 
 从本文研究内容来看，命名实体识别的作用主要体现在两个方面：一方面，它是构建图结构或语义索引的起点，
@@ -299,18 +287,17 @@ OpenIE 更强调开放域、可扩展和领域无关的抽取能力。给定一�
 
 \noindent 其中，$\mathcal{D}$ 表示包含 $k$ 个文档的文档集合，$d_i$ 表示第 $i$ 个文档，$\mathcal{T}(d_i)$ 表示从文档 $d_i$ 中抽取出的三元组集合，$\mathcal{T}_{\mathcal{D}}$ 表示整个文档集合中的全局关系三元组集合。
 
-如\figref{fig: OpenIE示意图}所示，展示了开放式信息抽取的基本流程。
 OpenIE 的代表性工作可以追溯到 Etzioni\cite{openie} 等人提出的 TextRunner 框架，其核心思想是从海量文本中自动抽取开放域关系，
 而不依赖预定义关系模板。这一工作被普遍视为开放式信息抽取方向的开端。
 随后，Schmitz\cite{schmitz2012open} 等人提出 OLLIE，在依存句法分析基础上进一步提升了抽取质量，能够处理更加复杂的语义结构，
 如归因关系和条件关系，从而显著增强了开放式抽取的表达能力。
 
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=0.90\textwidth]{OpenIE示意图.png}
-	\caption{OpenIE基本流程}
-	\label{fig: OpenIE示意图}
-\end{figure}
+% \begin{figure}[htbp]
+% 	\centering
+% 	\includegraphics[width=0.90\textwidth]{OpenIE示意图.png}
+% 	\caption{OpenIE基本流程}
+% 	\label{fig: OpenIE示意图}
+% \end{figure}
 
 从技术实现上看，OpenIE 方法大致可以分为三类。
 第一类是基于规则与模式匹配的方法，通过句法模板、依存路径和启发式规则抽取关系；
@@ -358,4 +345,4 @@ OpenIE 则容易受到抽取噪声和关系表达不稳定的影响。如何根�
 首先，介绍了朴素检索增强生成方法的基本框架及其在知识增强方面的优势与局限；
 其次，分析了基于知识图谱的检索增强生成方法，通过结构化建模提升多跳推理能力，同时指出其在图谱质量与计算开销方面的挑战；
 随后，介绍了文本表示与向量检索技术，为高效语义匹配与大规模检索提供基础支撑；
-最后，阐述了命名实体识别与开放式信息抽取技术在结构化知识构建中的作用。
+最后，介绍了知识图谱构建技术中的命名实体识别与开放式信息抽取方法，为后续结构化知识构建提供必要的技术支撑。
