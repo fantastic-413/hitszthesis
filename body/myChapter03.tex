@@ -57,7 +57,7 @@ TTRAG 专为复杂的推理任务而设计。它首先构建短语结构三元�
 （1）高精度上下文融合： 通过先构建低噪声的短语结构三元组推理路径，再引入与推理路径高度相关的文本信息，
 实现结构化知识与非结构化知识的高效融合，从而显著降低无关信息干扰。
 
-（2）可解释且可靠的推理过程： 基于显式的短语结构三元组推理链，模型能够生成透明且可验证的推理路径，
+（2）可解释且可靠的推理过程： 基于显式的短语结构三元组推理路径，模型能够生成透明且可验证的推理路径，
 有效提升生成结果的可信度并减少幻觉现象。
 
 （3）优越的实验性能： 在多个多跳问答数据集上的实验结果表明，TTRAG在准确率和F1指标上均优于现有方法，
@@ -154,8 +154,7 @@ $\mathcal{A}_q$ 表示针对问题 $q$ 的答案。
 \noindent 其中，
 $\mathcal{D}_k=\{d_1,d_2,\dots,d_k\}$。
 
-检索器可采用稠密向量检索模型，
-通过编码器将查询与文档映射为向量表示：
+检索器可采用稠密向量编码器将查询与文档映射为向量表示：
 \begin{equation}
 \mathbf{q}=\text{Enc}(q),\quad
 \mathbf{d}_i=\text{Enc}(d_i),
@@ -626,7 +625,7 @@ TTRAG 的两种变体 TTRAG$_{\text{sk+docs}}$ 与 TTRAG$_{\text{sk+sens}}$ 在�
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.75 \linewidth]{token_em_hippo2_combined_1.pdf}
+  \includegraphics[width=0.98 \linewidth]{token_em_hippo2_combined_1.pdf}
   \caption{TTRAG 与 HippoRAG2 在 Token 使用量与 EM 指标上的对比}
   \label{fig:token_cost_hippo2}
 \end{figure}
@@ -647,17 +646,6 @@ TTRAG 的两种变体 TTRAG$_{\text{sk+docs}}$ 与 TTRAG$_{\text{sk+sens}}$ 在�
 “tris+alldocs” 表示结合使用推理路径与所有检索到的文档。
 实验结果表明，将推理路径（sk）与检索上下文（docs 或 sens）相结合能够显著提升模型性能，
 验证了本章方法在结构化推理与文本证据融合方面的有效性。
-
-具体而言，仅使用推理路径的 TTRAG$_{\text{sk}}$ 平均 EM 为 45.93\%，
-而仅使用文档检索的 TTRAG$_{\text{docs}}$ 平均 EM 为 47.27\%。
-当两者结合时，性能显著提升，TTRAG$_{\text{sk+docs}}$ 的平均 EM 达到 48.70\%，体现出明显的协同增益。
-
-进一步地，采用句子级上下文的 TTRAG$_{\text{sk+sens}}$ 表现更加优越，其平均 EM 为 48.33\%，F1 达到 61.31\%。
-这表明，相较于直接使用完整文档，经过筛选的高质量句子级上下文能够提供更高的知识密度，从而提升模型性能。
-
-此外，本章参考 HippoRAG2 中的 few-shot 提示策略，并将其与本章方法结合，进一步提升了模型表现。
-实验结果显示，在引入 CoT（Chain-of-Thought）与 few-shot 提示后，TTRAG$_{\text{sk+alldocs}}$ 的平均 EM 提升至 54.50\%，
-F1 达到 66.88\%，取得显著提升。这一结果表明，本章方法与提示工程策略具有良好的兼容性，能够进一步激发大语言模型的推理能力。
 
 \begin{table}[htbp]
   \centering
@@ -683,6 +671,17 @@ F1 达到 66.88\%，取得显著提升。这一结果表明，本章方法与提
   % }
 \end{table}
 
+具体而言，仅使用推理路径的 TTRAG$_{\text{sk}}$ 平均 EM 为 45.93\%，
+而仅使用文档检索的 TTRAG$_{\text{docs}}$ 平均 EM 为 47.27\%。
+当两者结合时，性能显著提升，TTRAG$_{\text{sk+docs}}$ 的平均 EM 达到 48.70\%，体现出明显的协同增益。
+
+进一步地，采用句子级上下文的 TTRAG$_{\text{sk+sens}}$ 表现更加优越，其平均 EM 为 48.33\%，F1 达到 61.31\%。
+这表明，相较于直接使用完整文档，经过筛选的高质量句子级上下文能够提供更高的知识密度，从而提升模型性能。
+
+此外，本章参考 HippoRAG2 中的 few-shot 提示策略，并将其与本章方法结合，进一步提升了模型表现。
+实验结果显示，在引入 CoT（Chain-of-Thought）与 few-shot 提示后，TTRAG$_{\text{sk+alldocs}}$ 的平均 EM 提升至 54.50\%，
+F1 达到 66.88\%，取得显著提升。这一结果表明，本章方法与提示工程策略具有良好的兼容性，能够进一步激发大语言模型的推理能力。
+
 \myparagraph{上下文组织方式影响分析}
 为探究上下文组织方式对模型性能的影响，本章设计了两种新的上下文排列方式。
 第一种方法 $\text{TTRAG}_{\text{sk+sens+alt}}$ 采用短语结构三元组与对应文本句子交替排列的方式；
@@ -694,9 +693,6 @@ F1 达到 66.88\%，取得显著提升。这一结果表明，本章方法与提
 例如，在 HotpotQA 数据集上，两种方法均取得较好效果。  
 然而，在更具挑战性的多跳推理数据集（如 MuSiQue）上，这两种方法的表现均明显下降。
 这表明，仅通过调整上下文顺序或增加结构标注，难以从根本上解决复杂推理场景中的性能瓶颈问题。
-  
-综上所述，上下文结构优化虽能在一定程度上改善模型表现，但其效果依赖于任务复杂度。
-对于复杂多跳推理任务，仍需依赖更强的结构化推理机制与高质量证据筛选策略。
 
 \begin{table}[htbp]
   \centering
@@ -720,6 +716,9 @@ F1 达到 66.88\%，取得显著提升。这一结果表明，本章方法与提
   % }
 \end{table}
 
+综上所述，上下文结构优化虽能在一定程度上改善模型表现，但其效果依赖于任务复杂度。
+对于复杂多跳推理任务，仍需依赖更强的结构化推理机制与高质量证据筛选策略。
+
 \myparagraph{Zero-shot 设置与提示设计分析}
 在本章实验中，我们采用 zero-shot 设置，并明确约束大语言模型仅基于给定上下文生成答案。
 该设计旨在尽可能隔离模型参数知识的影响，从而更加公平地评估检索信息在 RAG 框架中的实际贡献。
@@ -733,13 +732,6 @@ F1 达到 66.88\%，取得显著提升。这一结果表明，本章方法与提
 HippoRAG2 在不同数据集上的性能均受到一定程度的影响，其中在 2WikiMultiHopQA 上的性能下降尤为明显。
 这进一步表明，在依赖 COT 与 few-shot 提示策略的设置下，模型更倾向于利用内部知识而非外部检索信息。
 因此，本章采用严格的 zero-shot 与基于上下文约束的生成方式，以确保不同方法之间的对比更加公平和可解释。
-
-如表\ref{table:app_result_hippo2}所示, “tris+alldocs” 表示结合使用推理路径与所有检索到的文档。
-在引入 CoT 与 few-shot 提示策略的设置下，
-TTRAG$_{\text{tris+alldocs}}$ 取得了最优整体性能。
-这表明 Thought 与 few-shot 提示在纯文本上下文场景中具有更强的性能提升作用。
-然而，即便在该设置下，引入 TTRAG 构建的短语结构三元组推理路径仍然能够在多个多跳问答基准上带来稳定的性能提升，
-验证了结构化推理信息的有效性。
 
 \begin{table}[htbp]
   \centering
@@ -765,10 +757,13 @@ TTRAG$_{\text{tris+alldocs}}$ 取得了最优整体性能。
   % }
 \end{table}
 
-此外，表\ref{table:app_token_cost_hippo2} 对采用 HippoRAG2 COT+few-shot 提示策略时，不同设置下的输入 Token 长度进行了分析。
-结果表明，在引入短语结构三元组推理路径后，TTRAG$_{\text{tris+alldocs}}$ 的输入长度仅有小幅增加，但却带来了显著的性能提升。
-这说明基于短语结构三元组的结构化推理路径是一种高效的上下文压缩与知识表达方式，能够在控制计算成本的同时有效增强模型的多跳推理能力。
-  
+如表\ref{table:app_result_hippo2}所示, “tris+alldocs” 表示结合使用推理路径与所有检索到的文档。
+在引入 CoT 与 few-shot 提示策略的设置下，
+TTRAG$_{\text{tris+alldocs}}$ 取得了最优整体性能。
+这表明 Thought 与 few-shot 提示在纯文本上下文场景中具有更强的性能提升作用。
+然而，即便在该设置下，引入 TTRAG 构建的短语结构三元组推理路径仍然能够在多个多跳问答基准上带来稳定的性能提升，
+验证了结构化推理信息的有效性。
+
 \begin{table}[htbp]
   \caption{采用 HippoRAG2 COT+few-shot 提示策略时，不同设置下输入 token 长度的对比。}
   \label{table:app_token_cost_hippo2}
@@ -789,16 +784,15 @@ TTRAG$_{\text{tris+alldocs}}$ 取得了最优整体性能。
   % }
 \end{table}
 
+此外，表\ref{table:app_token_cost_hippo2} 对采用 HippoRAG2 COT+few-shot 提示策略时，不同设置下的输入 Token 长度进行了分析。
+结果表明，在引入短语结构三元组推理路径后，TTRAG$_{\text{tris+alldocs}}$ 的输入长度仅有小幅增加，但却带来了显著的性能提升。
+这说明基于短语结构三元组的结构化推理路径是一种高效的上下文压缩与知识表达方式，能够在控制计算成本的同时有效增强模型的多跳推理能力。
+
 \subsection{样例分析}[Case Study]
 
 \myparagraph{可解释性分析}
 如图~\ref{fig:explain} 所示，传统基于文本的 RAG 方法在处理长上下文时，往往会引入大量无关信息，
 从而产生显著噪声，干扰大语言模型对关键信息的提取，进而影响最终问答结果的准确性。
-
-相比之下，本章方法首先通过推理路径构建（Reasoning Skeleton Construction）提取关键短语结构三元组，形成清晰的推理路径；
-随后通过上下文证据索引（Contextual Evidence Index）筛选与短语结构三元组高度相关的文本证据，从而对结构化推理路径进行语义补充。
-这种“先构建结构、再补充语义”的两阶段过程，有效过滤了冗余信息并提升了知识密度，使得模型能够基于更精确、可控的上下文进行推理，
-从而显著提高问答准确性。同时，该过程提供了显式的推理路径，有助于提升模型决策过程的可解释性。
 
 \begin{figure}[htbp]
   \centering
@@ -807,9 +801,22 @@ TTRAG$_{\text{tris+alldocs}}$ 取得了最优整体性能。
   \label{fig:explain}
 \end{figure}
 
+相比之下，本章方法首先通过推理路径构建（Reasoning Skeleton Construction）提取关键短语结构三元组，形成清晰的推理路径；
+随后通过上下文证据索引（Contextual Evidence Index）筛选与短语结构三元组高度相关的文本证据，从而对结构化推理路径进行语义补充。
+这种“先构建结构、再补充语义”的两阶段过程，有效过滤了冗余信息并提升了知识密度，使得模型能够基于更精确、可控的上下文进行推理，
+从而显著提高问答准确性。同时，该过程提供了显式的推理路径，有助于提升模型决策过程的可解释性。
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8 \linewidth]{analysis_win_lose_type.pdf}
+  \caption{TTRAG 与 HippoRAG2 在 2WikiMultiHopQA 数据集不同推理类型上的胜负对比分析。}
+  \label{fig:winlose}
+\end{figure}
+
 \myparagraph{不同推理类型性能分析（Performance Breakdown）}
 为进一步分析本章方法在不同推理类型下的性能表现，本章在 2WikiMultiHopQA 数据集上进行了 win--loss 分析。
-如\figref{fig:winlose} 所示，相较于 HippoRAG2，本章方法在各类推理任务上均取得了整体性能提升。
+如\figref{fig:winlose} 所示，正值表示TTRAG回答正确而基线模型回答错误的样本，负值则表示相反的情况。
+相较于 HippoRAG2，本章方法在各类推理任务上均取得了整体性能提升。
 其中，在 Comparison 与 Compositional 问题上，性能提升最为显著。
 % 与此同时，性能下降的样本数量较少，
 能够在各类推理类型上实现较为均衡且稳定的性能增强，并非仅针对某一特定推理模式进行优化而牺牲其他类型任务表现，体现出更全面的多跳推理能力与良好的泛化性。
@@ -831,18 +838,11 @@ TTRAG$_{\text{tris+alldocs}}$ 取得了最优整体性能。
 %   \label{fig:error_appendix}
 % \end{figure}
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.8 \linewidth]{analysis_win_lose_type.pdf}
-  \caption{TTRAG 与 HippoRAG2 在 2WikiMultiHopQA 数据集不同推理类型上的胜负对比分析。正值表示TTRAG回答正确而基线模型回答错误的样本，负值则表示相反的情况。}
-  \label{fig:winlose}
-\end{figure}
-
 \section{本章小结}[Brief summary]
 
 本章针对传统 RAG 方法在多跳推理任务中存在的上下文噪声高、推理路径不清晰以及结构信息利用不足等问题，提出了一种名为“基于结构分析的检索增强生成”（TTRAG）的新型框架，旨在解决复杂的推理任务。
 具体而言，本章首先通过检索器从语料库中获取与问题相关的候选文档，并利用大语言模型执行开放式信息抽取，构建文档级短语结构三元组图。
-在此基础上，设计了基于向量检索与大语言模型引导的推理路径构建方法，通过多跳路径扩展与束搜索策略生成高质量的短语结构三元组推理链。
+在此基础上，设计了基于向量检索与大语言模型引导的推理路径构建方法，通过迭代式路径扩展与束搜索策略生成高质量的短语结构三元组推理路径。
 随后，通过上下文证据索引机制，将推理路径与原始文本进行精确对齐，筛选出高相关的句子或文档级证据，从而在保证语义完整性的同时有效降低上下文噪声。
 在提示构建阶段，TTRAG将结构化的推理路径与对应文本证据进行有序编排，形成高质量上下文输入，引导大语言模型生成最终答案。
 该方法通过“结构引导 + 语义补充”的两阶段机制，实现了结构化知识与非结构化文本的有效融合。
