@@ -816,6 +816,37 @@ TTRAG$_{\text{tris+alldocs}}$ 取得了最优整体性能。
 能够在各类推理类型上实现较为均衡且稳定的性能增强，并非仅针对某一特定推理模式进行优化而牺牲其他类型任务表现，体现出更全面的多跳推理能力与良好的泛化性。
 上述结果从更细粒度角度揭示了模型在不同推理类型下的行为特征。
 
+文本证据对结构信息缺失的补充作用：
+进一步分析 TTRAG 如何缓解自动知识抽取过程中三元组信息不完整对推理结果的影响，
+如\figref{fig:case_missing_triple} 所示，
+对于问题：
+\textit{“Where was the husband of Joanna Elisabeth Of Holstein-Gottorp born?”}，
+仅使用短语结构三元组构建的推理路径进行回答时，
+模型得到的上下文主要包含
+``Joanna Elisabeth of Holstein-Gottorp place of birth Gottorp''
+等事实。
+由于推理路径中缺少
+Christian August 出生地点这一关键事实，
+模型容易将与问题相关实体所在家族的出生地信息误认为目标答案，
+最终错误地输出 ``Gottorp''。
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.98 \linewidth]{TTRAG_case2.png}
+  \caption{TTRAG 利用显式推理路径定位关键证据并补充缺失信息}
+  \label{fig:case_missing_triple}
+\end{figure}
+
+而在 TTRAG 中，
+通过基于结构化推理路径的上下文文本证据索引，
+利用文本证据补充了结构信息中缺失的出生地点事实，
+使模型能够依据完整证据链得到正确答案 ``Dornburg''。
+该案例表明，自动抽取的短语结构三元组虽然能够以紧凑形式提供推理线索，
+但受开放式信息抽取质量限制，仍可能存在关键事实遗漏的问题。
+TTRAG 所采用的“结构引导 + 文本补充”机制能够利用显式推理路径精确定位相关文本证据，
+对结构信息中的缺失内容进行有效补充，从而降低知识抽取误差对后续推理过程的影响，
+提高复杂多跳问答任务中的推理可靠性与结果可解释性。
+
 % \figref{fig:correct_appendix} 展示了不同推理类型下的正确率分布，\figref{fig:error_appendix} 则给出了对应的错误率分布。
 
 % \begin{figure}[htbp]
